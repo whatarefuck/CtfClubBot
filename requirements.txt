@@ -1,0 +1,4 @@
+psycopg2-binary
+alembic
+python-dotenv
+aiogram==3.15.0
