@@ -6,11 +6,13 @@ import datetime
 Base = declarative_base()
 
 class User(Base):
+    
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     full_name = Column(String)
+    root_me_nickname = Column(String)
     lives = Column(Integer, default=3)
     points = Column(Integer, default=0)
     violations = Column(Integer, default=0)
