@@ -25,6 +25,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String)
+    url = Column(String)
     deadline = Column(DateTime)
     assigned_user_id = Column(Integer, ForeignKey('users.id'))
     completed = Column(Boolean, default=False)
