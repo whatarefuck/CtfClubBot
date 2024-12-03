@@ -8,7 +8,7 @@ class UserRegisteryForm(StatesGroup):
 
 
 
-class addingtask(StatesGroup):
+class TaskForm(StatesGroup):
     name=State()
     url=State()
     description=State()
