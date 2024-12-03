@@ -25,10 +25,12 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String)
+
     deadline = Column(DateTime)
     assigned_user_id = Column(Integer, ForeignKey('users.id'))
     completed = Column(Boolean, default=False)
     url = Column(String)
+
     assigned_user = relationship("User", back_populates="tasks")
 
 class Competition(Base):
