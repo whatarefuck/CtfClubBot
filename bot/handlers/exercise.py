@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.root_me import scribe_root_me
 from database.db import get_db
 from database.task_dao import TaskDao
+from database.user_dao import UserDAO
 from states.user_states import TaskForm
 
 from aiogram.fsm.context import FSMContext
@@ -57,6 +58,13 @@ async def get_deadline(message: types.Message, state: FSMContext):
             print(name)
             
             task_dao.create_task(name, description, deadline,url)
+            task_dao.create_tasks_for_students(
+                 user_dao=UserDAO,
+                 task_name=name,
+                 task_description=description,
+                 task_deadline=deadline,
+                 task_url=url
+)
             await message.reply('Запись задачи в БД сохранена!')
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")
