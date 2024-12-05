@@ -38,7 +38,7 @@ async def get_description(message: types.Message, state: FSMContext):
 async def get_url(message: types.Message, state: FSMContext):
     url = message.text
     await state.update_data(url=url)
-    await message.reply("Введите дедлайн")
+    await message.reply("Введите дедлайн(формат "'д.м.г'")")
     await state.set_state(TaskForm.deadline)
 
 
