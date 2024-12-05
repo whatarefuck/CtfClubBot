@@ -17,3 +17,8 @@ class UserDAO:
         self.session.commit()
         self.session.refresh(new_user)
         return new_user
+
+    def get_all_students(self):
+        """Get all students excluding specific users"""
+        excluded_users = ['Байназар', 'Витя']
+        return self.session.query(User).filter(User.full_name.notin_(excluded_users)).all()
