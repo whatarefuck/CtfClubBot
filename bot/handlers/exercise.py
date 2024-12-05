@@ -8,34 +8,34 @@ from database.task_dao import TaskDao
 from states.user_states import TaskForm
 
 from aiogram.fsm.context import FSMContext
-import datetime
+from datetime import datetime
 
 add_task_router = Router()
 
 # Хэндлер на команду /add_task
 @add_task_router.message(Command("add_task"))
-async def get_name(message: types.Message, state: FSMContext):
+async def cmd_add_task(message: types.Message, state: FSMContext):
     
     await message.reply("Введите название")
     await state.set_state(TaskForm.name)
 
 
 @add_task_router.message(TaskForm.name)
-async def get_description(message: types.Message, state: FSMContext):
+async def get_name(message: types.Message, state: FSMContext):
     name = message.text
     await state.update_data(name=name)
     await message.reply("Введите описание")
     await state.set_state(TaskForm.description)
 
 @add_task_router.message(TaskForm.description)
-async def get_url(message: types.Message, state: FSMContext):
+async def get_description(message: types.Message, state: FSMContext):
     description = message.text
     await state.update_data(description=description)
     await message.reply("Введите ccылку")
     await state.set_state(TaskForm.url)
 
 @add_task_router.message(TaskForm.url)
-async def get_deadline(message: types.Message, state: FSMContext):
+async def get_url(message: types.Message, state: FSMContext):
     url = message.text
     await state.update_data(url=url)
     await message.reply("Введите дедлайн")
@@ -43,8 +43,9 @@ async def get_deadline(message: types.Message, state: FSMContext):
 
 
 @add_task_router.message(TaskForm.deadline)
-async def save_task(message: types.Message, state: FSMContext):
+async def get_deadline(message: types.Message, state: FSMContext):
     deadline = message.text
+    deadline=datetime.strptime(deadline, "%d.%m.%Y")
     await state.update_data(deadline=deadline)
     task_form_data = await state.get_data()
     try:
@@ -55,7 +56,7 @@ async def save_task(message: types.Message, state: FSMContext):
             url= task_form_data.get("url")
             print(name)
             
-            task_dao.create_task(name, description, url,deadline)
+            task_dao.create_task(name, description, deadline,url)
             await message.reply('Запись задачи в БД сохранена!')
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")
