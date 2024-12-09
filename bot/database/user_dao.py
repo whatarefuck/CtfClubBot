@@ -20,5 +20,5 @@ class UserDAO:
 
     def get_all_students(self):
         """Get all students excluding specific users"""
-        excluded_users = ['Байназар', 'Витя']
-        return self.session.query(User).filter(User.full_name.notin_(excluded_users)).all()
+        excluded_usernames = ['@vb_vik', '@iambainazar']
+        return self.session.query(User).filter(User.full_name.notin_(excluded_usernames)).all()

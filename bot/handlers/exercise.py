@@ -64,6 +64,7 @@ async def get_deadline(message: types.Message, state: FSMContext):
                  task_description=description,
                  task_deadline=deadline,
                  task_url=url
+                 
 )
             await message.reply('Запись задачи в БД сохранена!')
     except IntegrityError:

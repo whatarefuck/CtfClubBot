@@ -9,13 +9,15 @@ class TaskDao:
     def __init__(self, session):
         self.session = session
 
-    def create_task(self, name: str, description: str, deadline: datetime, url: str):
+    def create_task(self, name: str, description: str, deadline: datetime, url: str,user_id:str):
         """Create task in db at /add_task"""
         new_task = Task(
+
             name=name,
             description=description,
             deadline=deadline,
             url=url,
+            user_id=user_id,
         )
         print(new_task.__dict__)
         self.session.add(new_task)
