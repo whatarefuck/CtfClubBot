@@ -1,16 +1,7 @@
 from database.models import User
+from utils.helpers import ADMIN_NICKNAMES
 
 
-
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import NoResultFound
-
-def get_user_id_by_username(db_session: Session, username: str):
-    try:
-        user = db_session.query(User).filter(User.username == username).one()
-        return user.id
-    except NoResultFound:
-        return None
 class UserDAO:
     
     """Data access object for User"""
@@ -32,7 +23,5 @@ class UserDAO:
 
     def get_all_students(self):
         """Get all students excluding specific users"""
-        excluded_user_id = [get_user_id_by_username('vb_vik'), get_user_id_by_username('iambainazar')]
-
-        
-        return self.session.query(User).filter(User.id.notin_(excluded_user_id)).all()
+  
+        return self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
