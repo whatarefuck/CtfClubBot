@@ -1,6 +1,9 @@
 from database.models import User
+from utils.helpers import ADMIN_NICKNAMES
+
 
 class UserDAO:
+    
     """Data access object for User"""
     def __init__(self, session):
         self.session = session
@@ -17,3 +20,8 @@ class UserDAO:
         self.session.commit()
         self.session.refresh(new_user)
         return new_user
+
+    def get_all_students(self):
+        """Get all students excluding specific users"""
+  
+        return self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
