@@ -21,7 +21,7 @@ class TaskDao:
 
            
         )
-        print(new_task.__dict__)
+       
         self.session.add(new_task)
         self.session.commit()
         self.session.refresh(new_task)
