@@ -1,5 +1,5 @@
 from database.models import Task
-import datetime
+from datetime import datetime
 
 from database.user_dao import UserDAO
 
