@@ -2,7 +2,7 @@ import os
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
-from handlers import common_router,add_task_router
+from handlers import common_router,add_task_router,add_competition_router
 
 
 token = os.environ.get('BOT_TOKEN')
@@ -14,7 +14,7 @@ bot = Bot(token=token)
 dp = Dispatcher()
 
 
-dp.include_routers(common_router,add_task_router)
+dp.include_routers(common_router,add_task_router,add_competition_router)
 
 
 # Запуск процесса поллинга новых апдейтов
