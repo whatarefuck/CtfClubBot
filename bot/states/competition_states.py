@@ -10,4 +10,4 @@ class CompetitionForm(StatesGroup):
     description=State()
     date=State()
     points=State()
-    Participants=State()
+    participations=State()

@@ -38,7 +38,7 @@ async def get_url(message: types.Message, state: FSMContext):
 async def get_url(message: types.Message, state: FSMContext):
 
     
-    points = Integer(message.text) #хз что не так как испровить
+    points = int(message.text) #хз что не так как испровить
 
 
     await state.update_data(points=points)
@@ -57,7 +57,7 @@ async def get_deadline(message: types.Message, state: FSMContext):
             name = competition_form_data.get("name")
             description = competition_form_data.get("description")
             date = competition_form_data.get("date")
-            point=competition_form_data.get("point")
+            points=competition_form_data.get("point")
             print(name)
             
 
@@ -65,8 +65,8 @@ async def get_deadline(message: types.Message, state: FSMContext):
                 name=name,
                 description=description,
                 date=date,
-                point=point,
-                Participants=0,
+                points=points,
+                participations=0,
             )
             await message.reply('Запись задачи в БД сохранена!')
     except IntegrityError:
