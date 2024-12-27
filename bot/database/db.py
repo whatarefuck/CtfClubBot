@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from contextlib import contextmanager
 
-from bot.settings import config
+from settings import config
 
 load_dotenv()
 
