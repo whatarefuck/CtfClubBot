@@ -1,8 +1,5 @@
 import os
-
-
-ADMIN_NICKNAMES = os.getenv("ADMIN_NICKNAMES").split(",")
-
+from bot.settings import config
 
 def is_admin(nickname):
-    return nickname in ADMIN_NICKNAMES
+    return nickname in config.ADMIN_NICKNAMES.split()
