@@ -2,7 +2,6 @@ import os
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
-from handlers import common_router,add_task_router
 from settings import config
 from handlers import common_router,add_task_router,add_competition_router
 
