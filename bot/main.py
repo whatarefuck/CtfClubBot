@@ -3,13 +3,12 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from handlers import common_router,add_task_router
+from settings import config
 
-
-token = os.environ.get('BOT_TOKEN')
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 # Объект бота
-bot = Bot(token=token)
+bot = Bot(token=config.BOT_TOKEN)
 # Диспетчер
 dp = Dispatcher()
 
