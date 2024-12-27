@@ -1,6 +1,7 @@
 from database.models import User
-from utils.helpers import ADMIN_NICKNAMES
+from settings import config
 
+ADMIN_NICKNAMES = config.ADMIN_NICKNAMES.split()
 
 class UserDAO:
     
