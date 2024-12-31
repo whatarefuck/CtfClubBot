@@ -1,13 +1,9 @@
-from aiogram.fsm.state import StatesGroup, State
-
-
-
-
+from aiogram.fsm.state import State, StatesGroup
 
 
 class CompetitionForm(StatesGroup):
-    name=State()
-    description=State()
-    date=State()
-    points=State()
-    participations=State()
+    name = State()
+    description = State()
+    date = State()
+    points = State()
+    participations = State()

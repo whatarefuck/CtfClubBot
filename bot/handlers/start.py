@@ -1,22 +1,21 @@
+from aiogram import Router, types
+from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
-from aiogram import types
-from aiogram import Router
-from sqlalchemy.exc import IntegrityError
-from utils.root_me import scribe_root_me
 from database.db import get_db
 from database.user_dao import UserDAO
+from sqlalchemy.exc import IntegrityError
 from states.user_states import UserRegisteryForm
+from utils.root_me import scribe_root_me
+
 common_router = Router()
-from aiogram.fsm.context import FSMContext
 
 
-# Хэндлер на команду /start
 @common_router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await message.answer("Привет! Отправь мне свое ФИО.")
     await state.set_state(UserRegisteryForm.full_name)
-    
-    
+
+
 @common_router.message(UserRegisteryForm.full_name)
 async def get_fullname(message: types.Message, state: FSMContext):
     fullname = message.text
