@@ -132,4 +132,3 @@ exclude =
   ./.vscode,
   *migrations*,
   ./alembic,
-  ./
