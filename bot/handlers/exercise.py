@@ -1,24 +1,22 @@
+from datetime import datetime
+
+from aiogram import Router, types
 from aiogram.filters.command import Command
-from aiogram import types
-from aiogram import Router
-from sqlalchemy.exc import IntegrityError
-from utils.root_me import scribe_root_me
+from aiogram.fsm.context import FSMContext
 from database.db import get_db
 from database.task_dao import TaskDao
 from database.user_dao import UserDAO
+from sqlalchemy.exc import IntegrityError
 from states.user_states import TaskForm
 
-from aiogram.fsm.context import FSMContext
-from datetime import datetime
-
 add_task_router = Router()
+
 
 # Хэндлер на команду /add_task
 # Хэндлер на команду /add_task
 
 @add_task_router.message(Command("add_task"))
 async def cmd_add_task(message: types.Message, state: FSMContext):
-
     await message.reply("Введите название")
     await state.set_state(TaskForm.name)
 
@@ -69,8 +67,6 @@ async def get_deadline(message: types.Message, state: FSMContext):
                 task_deadline=deadline,
                 task_url=url,
                 students=students
-
-
 
             )
             await message.reply('Запись задачи в БД сохранена!')

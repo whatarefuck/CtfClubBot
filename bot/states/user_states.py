@@ -1,4 +1,4 @@
-from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.state import State, StatesGroup
 
 
 class UserRegisteryForm(StatesGroup):
@@ -7,10 +7,8 @@ class UserRegisteryForm(StatesGroup):
     root_me_nickname = State()
 
 
-
-
 class TaskForm(StatesGroup):
-    name=State()
-    url=State()
-    description=State()
-    deadline=State()
+    name = State()
+    url = State()
+    description = State()
+    deadline = State()

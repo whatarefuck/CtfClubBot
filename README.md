@@ -40,7 +40,9 @@
 ## Настройка базы данных
 1. Создайте файл `.env` в корневой директории проекта и добавьте параметры подключения к базе данных PostgreSQL:
    ```
+   BOT_TOKEN=yourtoken
    DATABASE_URL=postgresql://ctf:ctf@localhost:5432/ctf
+   ADMIN_NICKNAMES=admin1,admin2,admin3
    ```
 
 2. Настройте подключение в `database/db.py`, чтобы использовать параметры из `.env`.

@@ -1,12 +1,12 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
+
 class User(Base):
-    
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -18,6 +18,7 @@ class User(Base):
     violations = Column(Integer, default=0)
     tasks = relationship("Task", back_populates="assigned_user")
     participations = relationship("Participation", back_populates="user")
+
 
 class Task(Base):
     __tablename__ = 'tasks'
@@ -33,6 +34,7 @@ class Task(Base):
 
     assigned_user = relationship("User", back_populates="tasks")
 
+
 class Competition(Base):
     __tablename__ = 'competitions'
 
@@ -42,6 +44,7 @@ class Competition(Base):
     date = Column(DateTime, default=datetime.datetime.utcnow)
     points = Column(Integer)
     participations = relationship("Participation", back_populates="competition")
+
 
 class Participation(Base):
     __tablename__ = 'participations'
@@ -53,6 +56,7 @@ class Participation(Base):
 
     user = relationship("User", back_populates="participations")
     competition = relationship("Competition", back_populates="participations")
+
 
 class Violation(Base):
     __tablename__ = 'violations'
