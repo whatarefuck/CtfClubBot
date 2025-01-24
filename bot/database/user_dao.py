@@ -1,5 +1,6 @@
-from database.models import User
+from database.models import User, Task
 from settings import config
+from sqlalchemy.orm import joinedload
 
 ADMIN_NICKNAMES = config.ADMIN_NICKNAMES.split()
 
@@ -32,3 +33,17 @@ class UserDAO:
         if user:
             return user.id
         return None
+
+    def get_all_students_with_tasks(self):
+        """Получить всех пользователей вместе с их заданиями"""
+
+        users = (
+            self.session.query(User)
+            .filter(User.username.notin_(ADMIN_NICKNAMES))
+            .options(joinedload(User.tasks))
+            .all()
+        )
+        # Оставляем только невыполненные задачи
+        for user in users:
+            user.tasks = [task for task in user.tasks if not task.completed]
+        return users

@@ -1,6 +1,6 @@
 from datetime import datetime
-
-from database.models import Task
+from typing import List
+from database.models import Task, User
 
 
 class TaskDao:
@@ -12,13 +12,11 @@ class TaskDao:
     def create_task(self, name: str, description: str, deadline: datetime, url: str, user_id: int):
         """Create task in db at /add_task"""
         new_task = Task(
-
             name=name,
             description=description,
             deadline=deadline,
             url=url,
-            assigned_user_id=user_id
-
+            assigned_user_id=user_id,
         )
 
         self.session.add(new_task)
@@ -26,8 +24,14 @@ class TaskDao:
         self.session.refresh(new_task)
         return new_task
 
-    def create_tasks_for_students(self, task_name: str, task_description: str, task_deadline: datetime, task_url: str,
-                                  students: str):
+    def create_tasks_for_students(
+            self,
+            task_name: str,
+            task_description: str,
+            task_deadline: datetime,
+            task_url: str,
+            students: List[User],
+    ):
         """Create tasks for all students excluding specific users"""
 
         for student in students:
