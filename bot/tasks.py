@@ -1,12 +1,13 @@
 import asyncio
-from sqlalchemy.ext.asyncio import AsyncSession
-from bot.database.models import User, Task
-from bot.utils.root_me import get_solved_tasks_of_student
-from database.db import get_db
-from database.user_dao import UserDAO
 from logging import getLogger
 
+from database.db import get_db
+from database.user_dao import UserDAO
+
+from bot.utils.root_me import get_solved_tasks_of_student
+
 logger = getLogger()
+
 
 async def sync_education_tasks():
     while True:
@@ -27,5 +28,5 @@ async def sync_education_tasks():
                 await asyncio.sleep(60)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     asyncio.run(sync_education_tasks())

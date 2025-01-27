@@ -1,4 +1,4 @@
-from database.models import User, Task
+from database.models import User
 from settings import config
 from sqlalchemy.orm import joinedload
 
