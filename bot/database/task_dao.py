@@ -39,3 +39,12 @@ class TaskDao:
                 user_id=student.id,
             )
             print(f"Task created for student: {student.id}")
+    def user_tasks(self, user_id:int):
+        
+        
+        current_time = datetime.now()  # Получаем текущее время в UTC
+        return self.session.query(Task).filter(
+            Task.assigned_user_id == user_id,
+            Task.completed == False,
+            Task.deadline > current_time
+        ).all()
