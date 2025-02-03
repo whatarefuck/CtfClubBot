@@ -26,9 +26,9 @@ class UserDAO:
         """Get all students excluding specific users"""
 
         return self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
+
     def get_user_id_by_username(self, username: str):
         user = self.session.query(User).filter(User.username == username).first()
         if user:
             return user.id
         return None
-
