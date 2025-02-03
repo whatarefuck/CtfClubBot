@@ -17,7 +17,7 @@ async def missed_deadlines_handler(message: Message):
         task_dao = TaskDao(db)
         user_dao = UserDAO(db)
         missed_tasks = task_dao.missed_user_tasks(user_dao.get_user_id_by_username(message.from_user.username))
-        missed_task_info = " "  
+        missed_task_info = ""
         if missed_tasks:
             for missed_task in missed_tasks:
                 missed_task_info += f"Задача: {missed_task.name}\nОписание: {missed_task.description}\nСсылка: {missed_task.url}\n\n"
