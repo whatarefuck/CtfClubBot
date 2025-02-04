@@ -9,6 +9,7 @@ from handlers import (
     my_tasks_router,
     missed_deadlines_router,
     heal_router,
+    leaderboard_router,
 )
 from settings import config
 
@@ -26,6 +27,7 @@ dp.include_routers(
     my_tasks_router,
     missed_deadlines_router,
     heal_router,
+    leaderboard_router,
 )
 
 
