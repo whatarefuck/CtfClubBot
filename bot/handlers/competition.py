@@ -39,7 +39,7 @@ async def get_points(message: types.Message, state: FSMContext):
     points = int(message.text)  # хз что не так как испровить
 
     await state.update_data(points=points)
-    await message.reply("Введите дедлайн(формат "'д.м.г'")")
+    await message.reply("Введите дедлайн(формат " "д.м.г" ")")
     await state.set_state(CompetitionForm.date)
 
 
@@ -65,7 +65,7 @@ async def get_deadline(message: types.Message, state: FSMContext):
                 points=points,
                 participations=[],
             )
-            await message.reply('Запись задачи в БД сохранена!')
+            await message.reply("Запись задачи в БД сохранена!")
             await state.clear()  # Сбрасываем состояние
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")
