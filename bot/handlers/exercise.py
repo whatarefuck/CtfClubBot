@@ -69,6 +69,9 @@ async def get_deadline(message: types.Message, state: FSMContext):
                 students=students
 
             )
+
             await message.reply('Запись задачи в БД сохранена!')
+            await state.clear()  # Сбрасываем состояние
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")
+        await state.clear()  # Сбрасываем состояние

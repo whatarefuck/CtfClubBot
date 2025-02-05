@@ -36,6 +36,8 @@ async def save_user(message: types.Message, state: FSMContext):
             print(fullname)
             username = message.from_user.username
             user_dao.create_user(username, fullname, root_me_nickname)
-            await message.reply('Запись пользователя в БД сохранена!')
+            await message.reply("Пользователь сохранен в БД")
+            await state.clear()  # Сбрасываем состояние после успешной регистрации
     except IntegrityError:
         await message.reply("Ошибка сохранения пользователя в БД")
+        await state.clear()  # Сбрасываем состояние в случае ошибки
