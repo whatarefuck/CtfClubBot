@@ -90,6 +90,10 @@ ignore =
   WPS203
   ; Found too many await expressions: 7 > 5
   WPS217
+  ; Comparison to False should be 'if cond is False:' or 'if not cond:'
+  E712 
+  ; Line too long (133 > 120 characters)
+  E501 
 
 per-file-ignores =
   ; all tests
