@@ -70,3 +70,21 @@ class UserDAO:
             ranking_table.append({"ФИО": student.full_name, "Очки": student.points})
 
         return ranking_table
+    
+    def myprofile(self, username = str):
+        user = self.session.query(User).filter(User.username == username).first()
+        
+        if user:
+            return {
+    "success": (
+        f"User: {user.username}\n"
+        f"Root-Me: {user.root_me_nickname}\n"
+        f"Points: {user.points}\n"
+        f"HP: {user.lives}\n"
+        f"Violations: {user.violations}\n"
+        f"Participations: {user.participations}"
+    )
+}
+        else:
+            return None
+

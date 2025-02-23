@@ -10,6 +10,7 @@ from handlers import (
     missed_deadlines_router,
     heal_router,
     leaderboard_router,
+    my_profile_router,
 )
 from settings import config
 
@@ -28,6 +29,7 @@ dp.include_routers(
     missed_deadlines_router,
     heal_router,
     leaderboard_router,
+    my_profile_router,
 )
 
 
