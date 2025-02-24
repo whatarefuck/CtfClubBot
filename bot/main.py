@@ -2,7 +2,16 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from handlers import add_competition_router, add_task_router, start_router, my_tasks_router
+from handlers import (
+    add_competition_router,
+    add_task_router,
+    start_router,
+    my_tasks_router,
+    missed_deadlines_router,
+    heal_router,
+    leaderboard_router,
+    my_profile_router,
+)
 from settings import config
 
 from bot.tasks import sync_education_tasks
@@ -14,7 +23,16 @@ bot = Bot(token=config.BOT_TOKEN)
 # Диспетчер
 dp = Dispatcher()
 
-dp.include_routers(start_router, add_task_router, add_competition_router, my_tasks_router)
+dp.include_routers(
+    start_router,
+    add_task_router,
+    add_competition_router,
+    my_tasks_router,
+    missed_deadlines_router,
+    heal_router,
+    leaderboard_router,
+    my_profile_router,
+)
 
 
 # Запуск процесса поллинга новых апдейтов
