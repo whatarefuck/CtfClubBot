@@ -59,3 +59,32 @@ class UserDAO:
         else:
             self.session.rollback()
             return "Недостаточно поинтов"
+
+    def leaderboard(self):
+        # Извлекаем всех студентов, сортируя по убыванию баллов
+        students = self.session.query(User).order_by(User.points.desc()).all()
+
+        # Формируем таблицу с ФИО и количеством баллов
+        ranking_table = []
+        for student in students:
+            ranking_table.append({"ФИО": student.full_name, "Очки": student.points})
+
+        return ranking_table
+    
+    def myprofile(self, username = str):
+        user = self.session.query(User).filter(User.username == username).first()
+        
+        if user:
+            return {
+    "success": (
+        f"User: {user.username}\n"
+        f"Root-Me: {user.root_me_nickname}\n"
+        f"Points: {user.points}\n"
+        f"HP: {user.lives}\n"
+        f"Violations: {user.violations}\n"
+        f"Participations: {user.participations}"
+    )
+}
+        else:
+            return None
+
