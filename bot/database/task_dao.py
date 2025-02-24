@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import List
 
-from database.models import Task
+from database.models import Task, User
 
 
 class TaskDao:

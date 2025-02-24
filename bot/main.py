@@ -14,6 +14,8 @@ from handlers import (
 )
 from settings import config
 
+from bot.tasks import sync_education_tasks
+
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 # Объект бота
@@ -35,6 +37,8 @@ dp.include_routers(
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
+    # Запускаем задачу синхронизации задач
+    asyncio.create_task(sync_education_tasks())  # Фоновая задача
     await dp.start_polling(bot)
 
 

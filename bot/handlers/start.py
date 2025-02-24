@@ -1,6 +1,6 @@
 from aiogram import Router, types
-from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
+from aiogram.fsm.context import FSMContext
 from database.db import get_db
 from database.user_dao import UserDAO
 from sqlalchemy.exc import IntegrityError
