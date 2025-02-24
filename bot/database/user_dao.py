@@ -11,7 +11,7 @@ class UserDAO:
         self.session = session
 
     def create_user(self, username: str, full_name: str, root_me_nickname: str):
-        """Create user in db at /start"""
+        """Create user in self.session at /start"""
         new_user = User(
             username=username,
             full_name=full_name,
@@ -25,10 +25,37 @@ class UserDAO:
     def get_all_students(self):
         """Get all students excluding specific users"""
 
-        return self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
+        return (
+            self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
+        )
 
     def get_user_id_by_username(self, username: str):
         user = self.session.query(User).filter(User.username == username).first()
         if user:
             return user.id
         return None
+
+    def heal(self, username: str):
+        user = self.session.query(User).filter(User.username == username).first()
+        if user.points >= 10:
+            # Находим пользователя по Telegram никнейму
+
+            if not user:
+                return {"error": "User not found"}
+
+            # Добавляем жизни и отнимаем очки
+
+            user.lives += 3
+            user.points -= 10
+
+            # Сохраняем изменения в базе данных
+            self.session.commit()
+            self.session.refresh(user)
+
+            return {
+                "success": f"User {user.username} now has {user.lives} lives and {user.points} points."
+            }
+
+        else:
+            self.session.rollback()
+            return "Недостаточно поинтов"

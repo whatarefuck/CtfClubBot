@@ -21,9 +21,9 @@ async def get_solved_tasks_of_student(nickname: str) -> list[str]:
     html = await get_rootme_profile(nickname)
     soup = BeautifulSoup(html, "html.parser")
     tasks = soup.find_all(
-        'a',
-        href=lambda href: href and 'fr/Challenges/' in href,
-        title=lambda title: not title
+        "a",
+        href=lambda href: href and "fr/Challenges/" in href,
+        title=lambda title: not title,
     )
     task_names = [task.text for task in tasks]
     return task_names
@@ -53,5 +53,5 @@ def scribe_root_me(root_me_link: str):
 if __name__ == "__main__":
     """Example of usage."""
 
-    names = asyncio.run(get_solved_tasks_of_student('DarkMK692'))
+    names = asyncio.run(get_solved_tasks_of_student("DarkMK692"))
     print(names)

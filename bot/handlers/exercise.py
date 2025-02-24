@@ -15,6 +15,7 @@ add_task_router = Router()
 # Хэндлер на команду /add_task
 # Хэндлер на команду /add_task
 
+
 @add_task_router.message(Command("add_task"))
 async def cmd_add_task(message: types.Message, state: FSMContext):
     await message.reply("Введите название")
@@ -41,7 +42,7 @@ async def get_description(message: types.Message, state: FSMContext):
 async def get_url(message: types.Message, state: FSMContext):
     url = message.text
     await state.update_data(url=url)
-    await message.reply("Введите дедлайн(формат "'д.м.г'")")
+    await message.reply("Введите дедлайн(формат " "д.м.г" ")")
     await state.set_state(TaskForm.deadline)
 
 
@@ -66,11 +67,10 @@ async def get_deadline(message: types.Message, state: FSMContext):
                 task_description=description,
                 task_deadline=deadline,
                 task_url=url,
-                students=students
-
+                students=students,
             )
 
-            await message.reply('Запись задачи в БД сохранена!')
+            await message.reply("Запись задачи в БД сохранена!")
             await state.clear()  # Сбрасываем состояние
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")

@@ -36,7 +36,9 @@ async def test_get_fullname(mock_message, mock_fsm: FSMContext):
 
 
 @pytest.mark.asyncio
-async def test_save_user(mock_message, mock_fsm: FSMContext, mocked_db, mocked_scribe_root_me):
+async def test_save_user(
+    mock_message, mock_fsm: FSMContext, mocked_db, mocked_scribe_root_me
+):
     mock_message.text = "https://www.root-me.org/user"
     mock_message.from_user.username = "test_user"
 
@@ -56,7 +58,9 @@ async def test_save_user(mock_message, mock_fsm: FSMContext, mocked_db, mocked_s
 
 
 @pytest.mark.asyncio
-async def test_save_user_integrity_error(mock_message, mock_fsm: FSMContext, mocked_db, mocked_scribe_root_me):
+async def test_save_user_integrity_error(
+    mock_message, mock_fsm: FSMContext, mocked_db, mocked_scribe_root_me
+):
     mock_message.text = "https://www.root-me.org/user"
     mock_message.from_user.username = "test_user"
 
