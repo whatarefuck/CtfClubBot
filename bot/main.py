@@ -1,7 +1,8 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
+
+from aiogram import Bot, Dispatcher, types
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -23,6 +24,17 @@ bot = Bot(token=config.BOT_TOKEN)
 # Диспетчер
 dp = Dispatcher()
 
+commands = [
+    types.BotCommand(command='/start', description='Запустить бота'),
+    types.BotCommand(command='/my_tasks', description='Мои невыполненные задачи'),
+    types.BotCommand(command='/my_profile', description='Мой профиль'),
+    types.BotCommand(command='/leaderboard', description='Рейтинг участников'),
+    types.BotCommand(command='/heal', description='Исцелиться'),
+    types.BotCommand(command='/add_task', description='Отправить студентам задачу'),
+    types.BotCommand(command='/missed_deadlines', description='Посмотреть пропущенные дедлайны'),
+    types.BotCommand(command='/add_competition', description='Создать мероприятие'),
+]
+
 dp.include_routers(
     start_router,
     add_task_router,
@@ -37,6 +49,7 @@ dp.include_routers(
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
+    await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks())  # Фоновая задача
     await dp.start_polling(bot)

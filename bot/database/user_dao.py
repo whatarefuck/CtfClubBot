@@ -49,7 +49,7 @@ class UserDAO:
         for user in users:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
-=======
+
     def heal(self, username: str):
         user = self.session.query(User).filter(User.username == username).first()
         if user.points >= 10:
