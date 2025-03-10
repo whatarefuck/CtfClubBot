@@ -35,7 +35,7 @@ class UserDAO:
         if user:
             return user.id
         return None
- 
+
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
 
