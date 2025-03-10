@@ -4,7 +4,7 @@ from logging import getLogger
 from database.db import get_db
 from database.user_dao import UserDAO
 
-from bot.utils.root_me import get_solved_tasks_of_student
+from utils.root_me import get_solved_tasks_of_student
 
 logger = getLogger()
 
