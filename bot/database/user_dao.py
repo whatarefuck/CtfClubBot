@@ -35,7 +35,7 @@ class UserDAO:
         if user:
             return user.id
         return None
- 
+
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
 
@@ -49,7 +49,7 @@ class UserDAO:
         for user in users:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
-=======
+
     def heal(self, username: str):
         user = self.session.query(User).filter(User.username == username).first()
         if user.points >= 10:
