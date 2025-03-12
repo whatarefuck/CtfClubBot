@@ -4,7 +4,7 @@ from logging import getLogger
 from database.db import get_db
 from database.user_dao import UserDAO
 
-from bot.utils.root_me import get_solved_tasks_of_student
+from utils.root_me import get_solved_tasks_of_student
 
 logger = getLogger()
 
@@ -18,9 +18,12 @@ async def sync_education_tasks():
             for user in users:
                 if user.root_me_nickname:
                     # try:
-                    solved_tasks = await get_solved_tasks_of_student(user.root_me_nickname)
+                    solved_tasks = await get_solved_tasks_of_student(
+                        user.root_me_nickname
+                    )
                     for task in user.tasks:
-                        task.completed = task.name in solved_tasks
+                        task.completed = (task.name in solved_tasks) and ()
+
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
                     # except Exception as e:

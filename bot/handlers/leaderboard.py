@@ -16,4 +16,4 @@ async def leaderboard_handler(message: Message):
     with get_db() as db:
         user_dao = UserDAO(db)
 
-        await message.reply(str(user_dao.leaderboard()))
+        await message.reply(str(user_dao.leaderboard(message.from_user.username)))

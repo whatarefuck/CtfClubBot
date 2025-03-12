@@ -35,7 +35,13 @@ class UserDAO:
         if user:
             return user.id
         return None
- 
+
+    def get_user_full_name_by_username(self, username: str):
+        user = self.session.query(User).filter(User.username == username).first()
+        if user:
+            return user.full_name
+        return None
+
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
 
@@ -49,7 +55,7 @@ class UserDAO:
         for user in users:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
-=======
+
     def heal(self, username: str):
         user = self.session.query(User).filter(User.username == username).first()
         if user.points >= 10:
@@ -75,14 +81,26 @@ class UserDAO:
             self.session.rollback()
             return "Недостаточно поинтов"
 
-    def leaderboard(self):
+    def leaderboard(self, username: str):
         # Извлекаем всех студентов, сортируя по убыванию баллов
         students = self.session.query(User).order_by(User.points.desc()).all()
 
         # Формируем таблицу с ФИО и количеством баллов
-        ranking_table = []
+        ranking_table = [0]
+        finish_table = []
+        i = 0
         for student in students:
-            ranking_table.append({"ФИО": student.full_name, "Очки": student.points})
+            i += 1
+            if student.username == username:
+                finish_table = [
+                    {"#": i, "ФИО": student.full_name, "Очки": student.points}
+                ]
+
+            ranking_table.append(
+                {"#": i, "ФИО": student.full_name, "Очки": student.points}
+            )
+        ranking_table[0] = finish_table[0]
+        ranking_table = ranking_table[0:20]
 
         return ranking_table
 

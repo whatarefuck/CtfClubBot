@@ -1,6 +1,7 @@
 from aiogram import Router
 from aiogram.filters.command import Command
 from aiogram.types import Message
+from aiogram.enums import ParseMode
 
 from database.db import get_db
 
@@ -17,4 +18,7 @@ async def my_profile_handler(message: Message):
         user_dao = UserDAO(db)
         message.from_user.username
 
-        await message.reply(str(user_dao.myprofile(message.from_user.username)))
+        await message.reply(
+            str(user_dao.myprofile(message.from_user.username)),
+            parse_mode=ParseMode.HTML,
+        )

@@ -14,7 +14,7 @@ from handlers import (
 )
 from settings import config
 
-from bot.tasks import sync_education_tasks
+from tasks import sync_education_tasks
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
