@@ -26,6 +26,7 @@ async def sync_education_tasks():
                     # except Exception as e:
                     #     logger.error(f"Error syncing tasks for {user.username}: {e.}")
                 await asyncio.sleep(60)
+        await asyncio.sleep(0.1)
 
 
 if __name__ == "__main__":

@@ -11,9 +11,10 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
-    def create_user(self, username: str, full_name: str, root_me_nickname: str):
+    def create_user(self, username: str, full_name: str, root_me_nickname: str, tg_id: int):
         """Create user in self.session at /start"""
         new_user = User(
+            tg_id=tg_id,
             username=username,
             full_name=full_name,
             root_me_nickname=root_me_nickname,
@@ -34,7 +35,13 @@ class UserDAO:
         user = self.session.query(User).filter(User.username == username).first()
         if user:
             return user.id
-        return None
+
+    def get_user_by_tg_id(self, tg_id: int) -> User:
+        """Получить пользователя по его телеграм ID.
+
+        :param tg_id: Телеграмм айди
+        """
+        return self.session.query(User).filter(User.tg_id == tg_id).first()
 
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
