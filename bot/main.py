@@ -1,8 +1,7 @@
 import asyncio
 import logging
 
-
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, Router
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -14,7 +13,7 @@ from handlers import (
     my_profile_router,
 )
 from settings import config
-
+from middlewares import AuthMiddleware
 from tasks import sync_education_tasks
 
 # Включаем логирование, чтобы не пропустить важные сообщения
@@ -46,12 +45,13 @@ dp.include_routers(
     my_profile_router,
 )
 
+dp.message.middleware(AuthMiddleware())
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
-    await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks())  # Фоновая задача
+    await bot.set_my_commands(commands)
     await dp.start_polling(bot)
 
 
