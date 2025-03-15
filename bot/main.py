@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher, types, Router
+from aiogram import Bot, Dispatcher, types
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -46,6 +46,7 @@ dp.include_routers(
 )
 
 dp.message.middleware(AuthMiddleware())
+
 
 # Запуск процесса поллинга новых апдейтов
 async def main():

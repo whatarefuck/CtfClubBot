@@ -1,7 +1,5 @@
 from aiogram.types import Message
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from typing import Callable, Dict, Any, Awaitable, Optional
 
 from database.db import get_db
@@ -11,6 +9,7 @@ from logging import getLogger
 logger = getLogger()
 
 REGISTER_HANDLERS = ["cmd_start", "get_fullname", "save_user"]
+
 
 def get_original_callback_name(handler: Callable) -> Optional[str]:
     """
@@ -31,6 +30,7 @@ def get_original_callback_name(handler: Callable) -> Optional[str]:
             return callback_func.__name__
 
     return None
+
 
 class AuthMiddleware(BaseMiddleware):
 
