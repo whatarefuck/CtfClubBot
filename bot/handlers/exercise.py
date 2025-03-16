@@ -75,3 +75,6 @@ async def get_deadline(message: types.Message, state: FSMContext):
     except IntegrityError:
         await message.reply("Ошибка сохранения задачи в БД")
         await state.clear()  # Сбрасываем состояние
+
+
+#sdrfgghjikjkkkokjkm
