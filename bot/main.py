@@ -54,7 +54,6 @@ sentry_sdk.init(
     environment=config.ENV,
 )
 
-zero = 1 / 0
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
