@@ -2,6 +2,7 @@ from database.models import User
 from settings import config
 from sqlalchemy.orm import joinedload
 
+
 ADMIN_NICKNAMES = config.ADMIN_NICKNAMES.split()
 
 
@@ -108,15 +109,18 @@ class UserDAO:
         user = self.session.query(User).filter(User.username == username).first()
 
         if user:
+            data = {
+                "User": user.username,
+                "Root-Me": user.root_me_nickname,
+                "Points": user.points,
+                "HP": user.lives,
+                "Violations": user.violations,
+                "Participations": user.participations,
+            }
+            output = "\n".join(f"{key}: {value}" for key, value in data.items())
+            print(output)
             return {
-                "success": (
-                    f"User: {user.username}\n"
-                    f"Root-Me: {user.root_me_nickname}\n"
-                    f"Points: {user.points}\n"
-                    f"HP: {user.lives}\n"
-                    f"Violations: {user.violations}\n"
-                    f"Participations: {user.participations}"
-                )
+                output,
             }
         else:
             return None

@@ -19,6 +19,5 @@ async def my_profile_handler(message: Message):
         message.from_user.username
 
         await message.reply(
-            str(user_dao.myprofile(message.from_user.username)),
-            parse_mode=ParseMode.HTML,
+            user_dao.myprofile(message.from_user.username), parse_mode=ParseMode.HTML
         )
