@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import sentry_sdk
+
 
 from aiogram import Bot, Dispatcher, types
 from handlers import (
@@ -43,6 +45,14 @@ dp.include_routers(
     heal_router,
     leaderboard_router,
     my_profile_router,
+)
+
+sentry_sdk.init(
+    dsn=config.SENTRY_DSN,
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+    environment=config.ENV,
 )
 
 dp.message.middleware(AuthMiddleware())

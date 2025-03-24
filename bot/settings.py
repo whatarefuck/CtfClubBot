@@ -13,6 +13,9 @@ class Config(BaseSettings):
     DATABASE_URL: str = "postgresql://ctf:ctf@localhost:5432/ctf"
     ADMIN_NICKNAMES: str = "tgadminnick1,tgadminnick2"
 
+    SENTRY_DSN: str = "https://1ec97a8cca639cde4c69d8b8597dca04@o4507197457432576.ingest.us.sentry.io/4508985176555520"
+    ENV: str = "dev"
+
     class Config:
         env_file = ENV_PATH
         extra = "allow"  # Разрешить дополнительные параметры
