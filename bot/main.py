@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sentry_sdk
 
+
 from aiogram import Bot, Dispatcher, types
 from handlers import (
     add_competition_router,
@@ -14,7 +15,7 @@ from handlers import (
     my_profile_router,
 )
 from settings import config
-
+from middlewares import AuthMiddleware
 from tasks import sync_education_tasks
 
 # Включаем логирование, чтобы не пропустить важные сообщения
@@ -54,12 +55,14 @@ sentry_sdk.init(
     environment=config.ENV,
 )
 
+dp.message.middleware(AuthMiddleware())
+
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
-    await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks())  # Фоновая задача
+    await bot.set_my_commands(commands)
     await dp.start_polling(bot)
 
 
