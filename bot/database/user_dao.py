@@ -3,6 +3,7 @@ from settings import config
 from sqlalchemy.orm import joinedload
 
 ADMIN_NICKNAMES = config.ADMIN_NICKNAMES.split()
+TEACHER_NICKNAMES = config.TEACHER_NICKNAMES.split()
 
 
 class UserDAO:
@@ -41,7 +42,7 @@ class UserDAO:
 
         users = (
             self.session.query(User)
-            .filter(User.username.notin_(ADMIN_NICKNAMES))
+            .filter(User.username.notin_(TEACHER_NICKNAMES))
             .options(joinedload(User.tasks))
             .all()
         )
@@ -79,12 +80,9 @@ class UserDAO:
         # Извлекаем всех студентов, сортируя по убыванию баллов
         students = self.session.query(User).order_by(User.points.desc()).all()
 
-        # Формируем таблицу с ФИО и количеством баллов
-        ranking_table = []
-        for student in students:
-            ranking_table.append({"ФИО": student.full_name, "Очки": student.points})
-
-        return ranking_table
+        
+        
+        return students
 
     def myprofile(self, username=str):
         user = self.session.query(User).filter(User.username == username).first()
