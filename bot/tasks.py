@@ -38,7 +38,7 @@ async def sync_education_tasks():
                                         f"Task {task.id} for user {user.id} marked as failed (deadline passed)"
                                     )
                                     user.lives -= 1
-                                    # Если задача была завершена, но теперь не решена, уменьшаем HP
+                                    # Если задача была завершена, но не решена, уменьшаем HP
                                     logger.info(
                                         f"Decreased HP for user: {user.username}. Current HP: {user.lives}"
                                     )
