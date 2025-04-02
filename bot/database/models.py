@@ -29,7 +29,7 @@ class Task(Base):
 
     deadline = Column(DateTime)
     assigned_user_id = Column(Integer, ForeignKey("users.id"))
-    completed = Column(Boolean, default=False)
+    completed = Column(Boolean, default=None)
     url = Column(String)
 
     assigned_user = relationship("User", back_populates="tasks")
