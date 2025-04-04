@@ -4,6 +4,8 @@ import sentry_sdk
 
 
 from aiogram import Bot, Dispatcher, types
+
+from utils.notifications import Notifications
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -58,7 +60,6 @@ sentry_sdk.init(
 dp.message.middleware(AuthMiddleware())
 
 
-# Запуск процесса поллинга новых апдейтов
 async def main():
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks())  # Фоновая задача

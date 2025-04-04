@@ -15,6 +15,13 @@ class Config(BaseSettings):
 
     SENTRY_DSN: str = "https://1ec97a8cca639cde4c69d8b8597dca04@o4507197457432576.ingest.us.sentry.io/4508985176555520"
     ENV: str = "dev"
+    minimum_xp_count_to_heal: int = 10
+    _teacher_ids: list[int] = "393200400,704339275"
+
+    @property
+    def teacher_ids(self):
+        return self._teacher_ids.split(",")
+
 
     class Config:
         env_file = ENV_PATH

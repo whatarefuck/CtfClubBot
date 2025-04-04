@@ -7,14 +7,17 @@ from database.db import get_db
 
 from database.user_dao import UserDAO
 
+from database.models import User
+
 my_profile_router = Router()
 
 
 @my_profile_router.message(Command("my_profile"))
-async def my_profile_handler(message: Message):
-
-    with get_db() as db:
-        user_dao = UserDAO(db)
-        message.from_user.username
-
-        await message.reply(str(user_dao.myprofile(message.from_user.username)))
+async def my_profile_handler(message: Message, user: User):
+    return (
+        f"👤 *Профиль пользователя*\n\n"
+        f"🧑 Полное имя: {user.full_name or 'Не указано'}\n"
+        f"🎓 RootMe ник: {user.root_me_nickname or 'Не указано'}\n"
+        f"❤️ Жизни: {user.lives}\n"
+        f"⭐ Очки: {user.points}\n"
+    )
