@@ -63,7 +63,7 @@ dp.message.middleware(AuthMiddleware())
 
 async def main():
     # Запускаем задачу синхронизации задач
-    asyncio.create_task(sync_education_tasks())  # Фоновая задача
+    asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
     await bot.set_my_commands(commands)
     await dp.start_polling(bot)
 
