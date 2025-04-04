@@ -38,7 +38,7 @@ class AuthMiddleware(BaseMiddleware):
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
         event: Message,
-        data: Dict[str, Any]
+        data: Dict[str, Any],
     ) -> Any:
         tg_id = event.from_user.id
         handler_name = get_original_callback_name(handler)
@@ -47,7 +47,9 @@ class AuthMiddleware(BaseMiddleware):
             dao = UserDAO(session)
             user = dao.get_user_by_tg_id(tg_id)
             if not user and handler_name not in REGISTER_HANDLERS:
-                await event.answer("Не нашел вас в списке пользователей, зарегистрируйтесь командой /start")
+                await event.answer(
+                    "Не нашел вас в списке пользователей, зарегистрируйтесь командой /start"
+                )
                 return
 
             data["user"] = user

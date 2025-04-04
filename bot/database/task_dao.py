@@ -2,6 +2,8 @@ from datetime import datetime
 
 from database.models import Task
 
+from database.models import User
+
 
 class TaskDao:
     """Data access object for Task"""
@@ -46,26 +48,26 @@ class TaskDao:
             )
             print(f"Task created for student : {student.id}")
 
-    def user_tasks(self, user_id: int):
+    def user_tasks(self, user: User):
 
         current_time = datetime.now()  # Получаем текущее время в UTC
         return (
             self.session.query(Task)
             .filter(
-                Task.assigned_user_id == user_id,
+                Task.assigned_user_id == user.id,
                 Task.completed == False,
                 Task.deadline > current_time,
             )
             .all()
         )
 
-    def missed_user_tasks(self, user_id: int):
+    def missed_user_tasks(self, user: User):
 
         current_time = datetime.now()  # Получаем текущее время в UTC
         return (
             self.session.query(Task)
             .filter(
-                Task.assigned_user_id == user_id,
+                Task.assigned_user_id == user.id,
                 Task.completed == False,
                 Task.deadline < current_time,
             )

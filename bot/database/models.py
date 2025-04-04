@@ -20,6 +20,9 @@ class User(Base):
     tasks = relationship("Task", back_populates="assigned_user")
     participations = relationship("Participation", back_populates="user")
 
+    def __repr__(self):
+        return f"@{self.username} - {self.full_name}>"
+
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -34,6 +37,11 @@ class Task(Base):
     url = Column(String)
 
     assigned_user = relationship("User", back_populates="tasks")
+
+    @property
+    def is_expired(self):
+        """Проверка, истек ли дедлайн задачи."""
+        return datetime.datetime.now() >= self.deadline
 
 
 class Competition(Base):
