@@ -23,6 +23,7 @@ class User(Base):
     def __repr__(self):
         return f"@{self.username} - {self.full_name}>"
 
+
 class Task(Base):
     __tablename__ = "tasks"
 

@@ -20,12 +20,16 @@ async def sync_education_tasks(bot: Bot):
             for user in users:
                 if user.root_me_nickname:
                     # try:
-                    solved_tasks = await get_solved_tasks_of_student(user.root_me_nickname)
+                    solved_tasks = await get_solved_tasks_of_student(
+                        user.root_me_nickname
+                    )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
                         if not task.completed and task.is_expired:
                             user.lives -= 1
-                            teacher_message = f"Задача {task.name} истек у студента {user}."
+                            teacher_message = (
+                                f"Задача {task.name} истек у студента {user}."
+                            )
                             logger.info(teacher_message)
                             notify = Notifications(bot)
                             await notify.say_about_deadline_fail(teacher_message)

@@ -18,7 +18,9 @@ start_router = Router()
 async def cmd_start(message: types.Message, state: FSMContext, user: User):
     logger.info(f"Запуск /start {user}")
     if user:
-        await message.answer("Привет, ты можешь посмотреть свой профиль командой /my_profile.")
+        await message.answer(
+            "Привет, ты можешь посмотреть свой профиль командой /my_profile."
+        )
         return
     await message.answer("Привет! Отправь мне свое ФИО.")
     await state.set_state(UserRegisteryForm.full_name)
@@ -45,7 +47,9 @@ async def save_user(message: types.Message, state: FSMContext):
             print(fullname)
             username = message.from_user.username
             user_dao.create_user(username, fullname, root_me_nickname, tg_id)
-            await message.answer("Хорошо, можете попробовать вызвать команды из меню. Например, /my_tasks")
+            await message.answer(
+                "Хорошо, можете попробовать вызвать команды из меню. Например, /my_tasks"
+            )
             await state.clear()  # Сбрасываем состояние после успешной регистрации
     except IntegrityError as e:
         logger.error(e)

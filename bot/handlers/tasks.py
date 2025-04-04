@@ -6,7 +6,6 @@ from database.db import get_db
 
 
 from database.task_dao import TaskDao
-from database.user_dao import UserDAO
 
 from database.models import User
 

@@ -5,7 +5,6 @@ import sentry_sdk
 
 from aiogram import Bot, Dispatcher, types
 
-from utils.notifications import Notifications
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -28,14 +27,16 @@ bot = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher()
 
 commands = [
-    types.BotCommand(command='/start', description='Запустить бота'),
-    types.BotCommand(command='/my_tasks', description='Мои невыполненные задачи'),
-    types.BotCommand(command='/my_profile', description='Мой профиль'),
-    types.BotCommand(command='/leaderboard', description='Рейтинг участников'),
-    types.BotCommand(command='/heal', description='Исцелиться'),
-    types.BotCommand(command='/add_task', description='Отправить студентам задачу'),
-    types.BotCommand(command='/missed_deadlines', description='Посмотреть пропущенные дедлайны'),
-    types.BotCommand(command='/add_competition', description='Создать мероприятие'),
+    types.BotCommand(command="/start", description="Запустить бота"),
+    types.BotCommand(command="/my_tasks", description="Мои невыполненные задачи"),
+    types.BotCommand(command="/my_profile", description="Мой профиль"),
+    types.BotCommand(command="/leaderboard", description="Рейтинг участников"),
+    types.BotCommand(command="/heal", description="Исцелиться"),
+    types.BotCommand(command="/add_task", description="Отправить студентам задачу"),
+    types.BotCommand(
+        command="/missed_deadlines", description="Посмотреть пропущенные дедлайны"
+    ),
+    types.BotCommand(command="/add_competition", description="Создать мероприятие"),
 ]
 
 dp.include_routers(

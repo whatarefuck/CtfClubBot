@@ -13,7 +13,9 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
-    def create_user(self, username: str, full_name: str, root_me_nickname: str, tg_id: int):
+    def create_user(
+        self, username: str, full_name: str, root_me_nickname: str, tg_id: int
+    ):
         """Create user in self.session at /start"""
         new_user = User(
             tg_id=tg_id,
@@ -65,7 +67,9 @@ class UserDAO:
 
     def get_teachers(self):
         """Получить всех старшекурсников."""
-        teachers = self.session.query(User).filter(User.tg_id.in_(config.teacher_ids)).all()
+        teachers = (
+            self.session.query(User).filter(User.tg_id.in_(config.teacher_ids)).all()
+        )
         logger.info(f"Получены учителя - {teachers}")
         return teachers
 

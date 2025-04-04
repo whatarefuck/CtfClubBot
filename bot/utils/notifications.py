@@ -6,8 +6,11 @@ from logging import getLogger
 from database.models import User
 
 logger = getLogger(__name__)
+
+
 class Notifications:
     """Класс для уведомлений"""
+
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -22,9 +25,13 @@ class Notifications:
             for student in students:
                 try:
                     await self.bot.send_message(chat_id=student.tg_id, text=message)
-                    logger.info(f"Sent {message} to {student.full_name} - @{student.username}")
+                    logger.info(
+                        f"Sent {message} to {student.full_name} - @{student.username}"
+                    )
                 except TelegramBadRequest:
-                    logger.warning(f"Чат @{student.username} - {student.full_name} с не найден.")
+                    logger.warning(
+                        f"Чат @{student.username} - {student.full_name} с не найден."
+                    )
 
     async def _say_teachers(self, message: str):
         """Уведомить всех учителей о чем-то.
@@ -37,18 +44,25 @@ class Notifications:
             for teacher in teachers:
                 try:
                     await self.bot.send_message(chat_id=teacher.tg_id, text=message)
-                    logger.info(f"Sent {message} to {teacher.full_name} - @{teacher.username}")
+                    logger.info(
+                        f"Sent {message} to {teacher.full_name} - @{teacher.username}"
+                    )
                 except TelegramBadRequest:
-                    logger.warning(f"Чат @{teacher.username} - {teacher.full_name} с не найден.")
+                    logger.warning(
+                        f"Чат @{teacher.username} - {teacher.full_name} с не найден."
+                    )
 
     async def _say_student(self, student: User, message: str):
         """Написать студенту о чем-то."""
-        with get_db() as session:
-            try:
-                await self.bot.send_message(chat_id=student.tg_id, text=message)
-                logger.info(f"Sent {message} to {student.full_name} - @{student.username}")
-            except TelegramBadRequest:
-                logger.warning(f"Чат @{student.username} - {student.full_name} с не найден.")
+        try:
+            await self.bot.send_message(chat_id=student.tg_id, text=message)
+            logger.info(
+                f"Sent {message} to {student.full_name} - @{student.username}"
+            )
+        except TelegramBadRequest:
+            logger.warning(
+                f"Чат @{student.username} - {student.full_name} с не найден."
+            )
 
     async def say_about_deadline_fail(self, message: str):
         await self._say_teachers(message)

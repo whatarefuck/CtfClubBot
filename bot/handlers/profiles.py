@@ -2,10 +2,6 @@ from aiogram import Router
 from aiogram.filters.command import Command
 from aiogram.types import Message
 
-from database.db import get_db
-
-
-from database.user_dao import UserDAO
 
 from database.models import User
 

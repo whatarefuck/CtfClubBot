@@ -7,6 +7,7 @@ from database.db import get_db
 
 from database.user_dao import UserDAO
 from database.models import User
+
 leaderboard_router = Router()
 
 
@@ -31,7 +32,9 @@ async def leaderboard_handler(message: Message, user: User):
             leaderboard_message += "Поздравляем! Вы в топ-20!"
         else:
             # If rating is not empty, calculate points needed
-            points_needed = max(top_user.points for top_user in rating) - user.points + 1
+            points_needed = (
+                max(top_user.points for top_user in rating) - user.points + 1
+            )
             leaderboard_message += f"Тебя нет в топе. Не расстраивайся, тебе осталось заработать всего {points_needed}"
 
     await message.answer(leaderboard_message)

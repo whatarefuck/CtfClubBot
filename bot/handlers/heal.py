@@ -23,5 +23,6 @@ async def heal_handler(message: Message, user: User):
     with get_db() as db:
         user_dao = UserDAO(db)
         user_dao.heal(user)
-        await message.answer(f"Увеличил твою HP на одну 🩹\n Теперь у тебя {user.lives}❤️.")
-
+        await message.answer(
+            f"Увеличил твою HP на одну 🩹\n Теперь у тебя {user.lives}❤️."
+        )
