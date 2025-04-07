@@ -42,7 +42,7 @@ class UserDAO:
         """
         return self.session.query(User).filter(User.tg_id == tg_id).first()
 
-    def get_all_students_with_tasks(self):
+    def get_all_students_with_tasks(self) -> list[User]:
         """Получить всех пользователей вместе с их заданиями"""
 
         users = (
