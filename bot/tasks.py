@@ -27,6 +27,7 @@ async def sync_education_tasks(bot: Bot):
                         task.completed = task.name in solved_tasks
                         if not task.completed and task.is_expired:
                             user.lives -= 1
+                            user.violations += 1
                             teacher_message = (
                                 f"Задача {task.name} истек у студента {user}."
                             )
