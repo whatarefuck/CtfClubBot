@@ -87,7 +87,7 @@ async def main():
     scheduler.start()
     await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
-    asyncio.create_task(sync_education_tasks())  # Фоновая задача
+    asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
 
 
     await dp.start_polling(bot)
