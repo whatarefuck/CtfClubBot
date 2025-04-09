@@ -34,10 +34,12 @@ class UserDAO:
         return (
             self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
         )
-    
+
     def get_all_active_students(self):
         return (
-            self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES),User.lives > 0).all()
+            self.session.query(User)
+            .filter(User.username.notin_(ADMIN_NICKNAMES), User.lives > 0)
+            .all()
         )
 
     def get_user_by_tg_id(self, tg_id: int) -> User:
