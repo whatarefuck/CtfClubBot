@@ -6,19 +6,17 @@ from database.db import get_db
 
 
 from database.task_dao import TaskDao
-from database.user_dao import UserDAO
+
+from database.models import User
 
 missed_deadlines_router = Router()
 
 
 @missed_deadlines_router.message(Command("missed_deadlines"))
-async def missed_deadlines_handler(message: Message):
+async def missed_deadlines_handler(message: Message, user: User):
     with get_db() as db:
         task_dao = TaskDao(db)
-        user_dao = UserDAO(db)
-        missed_tasks = task_dao.missed_user_tasks(
-            user_dao.get_user_id_by_username(message.from_user.username)
-        )
+        missed_tasks = task_dao.missed_user_tasks(user)
         missed_task_info = ""
         if missed_tasks:
             for missed_task in missed_tasks:

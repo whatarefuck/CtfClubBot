@@ -1,7 +1,9 @@
 from database.models import User
 from settings import config
 from sqlalchemy.orm import joinedload
+from logging import getLogger
 
+logger = getLogger(__name__)
 ADMIN_NICKNAMES = config.ADMIN_NICKNAMES.split()
 
 
@@ -11,9 +13,12 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
-    def create_user(self, username: str, full_name: str, root_me_nickname: str):
+    def create_user(
+        self, username: str, full_name: str, root_me_nickname: str, tg_id: int
+    ):
         """Create user in self.session at /start"""
         new_user = User(
+            tg_id=tg_id,
             username=username,
             full_name=full_name,
             root_me_nickname=root_me_nickname,
@@ -23,12 +28,13 @@ class UserDAO:
         self.session.refresh(new_user)
         return new_user
 
-    def get_all_students(self):
+    def get_all_students(self) -> list[User]:
         """Get all students excluding specific users"""
 
         return (
-            self.session.query(User).filter(User.username.notin_(ADMIN_NICKNAMES)).all()
+            self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
         )
+
 
     def get_all_active_students(self):
         return (
@@ -43,12 +49,20 @@ class UserDAO:
             return user.id
         return None
 
+    def get_user_by_tg_id(self, tg_id: int) -> User:
+        """Получить пользователя по его телеграм ID.
+
+        :param tg_id: Телеграмм айди
+        """
+        return self.session.query(User).filter(User.tg_id == tg_id).first()
+
+
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
 
         users = (
             self.session.query(User)
-            .filter(User.username.notin_(ADMIN_NICKNAMES))
+            .filter(User.tg_id.notin_(config.teacher_ids))
             .options(joinedload(User.tasks))
             .all()
         )
@@ -57,55 +71,23 @@ class UserDAO:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
 
-    def heal(self, username: str):
-        user = self.session.query(User).filter(User.username == username).first()
-        if user.points >= 10:
-            # Находим пользователя по Telegram никнейму
+    def heal(self, user: User):
+        """Обменять 10 опыта на 1 HP."""
 
-            if not user:
-                return {"error": "User not found"}
+        user.lives += 3
+        user.points -= 10
 
-            # Добавляем жизни и отнимаем очки
+        self.session.commit()
+        self.session.refresh(user)
 
-            user.lives += 3
-            user.points -= 10
-
-            # Сохраняем изменения в базе данных
-            self.session.commit()
-            self.session.refresh(user)
-
-            return {
-                "success": f"User {user.username} now has {user.lives} lives and {user.points} points."
-            }
-
-        else:
-            self.session.rollback()
-            return "Недостаточно поинтов"
+    def get_teachers(self):
+        """Получить всех старшекурсников."""
+        teachers = (
+            self.session.query(User).filter(User.tg_id.in_(config.teacher_ids)).all()
+        )
+        logger.info(f"Получены учителя - {teachers}")
+        return teachers
 
     def leaderboard(self):
-        # Извлекаем всех студентов, сортируя по убыванию баллов
-        students = self.session.query(User).order_by(User.points.desc()).all()
-
-        # Формируем таблицу с ФИО и количеством баллов
-        ranking_table = []
-        for student in students:
-            ranking_table.append({"ФИО": student.full_name, "Очки": student.points})
-
-        return ranking_table
-
-    def myprofile(self, username=str):
-        user = self.session.query(User).filter(User.username == username).first()
-
-        if user:
-            return {
-                "success": (
-                    f"User: {user.username}\n"
-                    f"Root-Me: {user.root_me_nickname}\n"
-                    f"Points: {user.points}\n"
-                    f"HP: {user.lives}\n"
-                    f"Violations: {user.violations}\n"
-                    f"Participations: {user.participations}"
-                )
-            }
-        else:
-            return None
+        """Извлекаем всех студентов, сортируя по убыванию баллов."""
+        return self.session.query(User).order_by(User.points.desc()).limit(20).all()
