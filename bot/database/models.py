@@ -10,6 +10,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    tg_id = Column(Integer, index=True)
     username = Column(String, unique=True, index=True)
     full_name = Column(String)
     root_me_nickname = Column(String)
@@ -18,6 +19,9 @@ class User(Base):
     violations = Column(Integer, default=0)
     tasks = relationship("Task", back_populates="assigned_user")
     participations = relationship("Participation", back_populates="user")
+
+    def __repr__(self):
+        return f"@{self.username} - {self.full_name}>"
 
 
 class Task(Base):
@@ -33,6 +37,11 @@ class Task(Base):
     url = Column(String)
 
     assigned_user = relationship("User", back_populates="tasks")
+
+    @property
+    def is_expired(self):
+        """Проверка, истек ли дедлайн задачи."""
+        return datetime.datetime.now() >= self.deadline
 
 
 class Competition(Base):

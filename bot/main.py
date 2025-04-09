@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sentry_sdk
 
 from tasks import restore_student_lives
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -8,6 +9,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from pytz import timezone
 
 from aiogram import Bot, Dispatcher, types
+
 from handlers import (
     add_competition_router,
     add_task_router,
@@ -19,7 +21,7 @@ from handlers import (
     my_profile_router,
 )
 from settings import config
-
+from middlewares import AuthMiddleware
 from tasks import sync_education_tasks
 
 # Включаем логирование, чтобы не пропустить важные сообщения
@@ -53,9 +55,19 @@ dp.include_routers(
     my_profile_router,
 )
 
+sentry_sdk.init(
+    dsn=config.SENTRY_DSN,
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+    environment=config.ENV,
+)
 
-# Запуск процесса поллинга новых апдейтов
+dp.message.middleware(AuthMiddleware())
+
+
 async def main():
+
     scheduler = AsyncIOScheduler()
     # Добавляем периодическую задачу восстановления жизней
     # Выполняется каждое 10-е число месяца в 00:00 по МСК (UTC+3)

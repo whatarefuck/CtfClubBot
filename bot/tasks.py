@@ -1,6 +1,8 @@
 import asyncio
+from aiogram import Bot
 from logging import getLogger
 
+from utils.notifications import Notifications
 from database.db import get_db
 from database.user_dao import UserDAO
 
@@ -12,7 +14,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 logger = getLogger()
 
 
-async def sync_education_tasks():
+async def sync_education_tasks(bot: Bot):
     while True:
         with get_db() as session:
             # Fetch all users with their tasks
@@ -26,11 +28,22 @@ async def sync_education_tasks():
                     )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
+                        if not task.completed and task.is_expired:
+                            user.lives -= 1
+                            user.violations += 1
+                            teacher_message = (
+                                f"Задача {task.name} истек у студента {user}."
+                            )
+                            logger.info(teacher_message)
+                            notify = Notifications(bot)
+                            await notify.say_about_deadline_fail(teacher_message)
+
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
                     # except Exception as e:
                     #     logger.error(f"Error syncing tasks for {user.username}: {e.}")
                 await asyncio.sleep(60)
+        await asyncio.sleep(0.1)
 
 
 async def restore_student_lives():
