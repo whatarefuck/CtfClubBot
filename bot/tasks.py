@@ -7,8 +7,7 @@ from database.user_dao import UserDAO
 from utils.root_me import get_solved_tasks_of_student
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-from pytz import timezone
+
 
 logger = getLogger()
 
@@ -22,7 +21,9 @@ async def sync_education_tasks():
             for user in users:
                 if user.root_me_nickname:
                     # try:
-                    solved_tasks = await get_solved_tasks_of_student(user.root_me_nickname)
+                    solved_tasks = await get_solved_tasks_of_student(
+                        user.root_me_nickname
+                    )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
                     session.commit()
@@ -31,6 +32,7 @@ async def sync_education_tasks():
                     #     logger.error(f"Error syncing tasks for {user.username}: {e.}")
                 await asyncio.sleep(60)
 
+
 async def restore_student_lives():
     """Восстановление жизней всех активных студентов до 3-х."""
     try:
@@ -38,13 +40,14 @@ async def restore_student_lives():
             dao = UserDAO(session)
             # Получаем всех "живых" пользователей (HP > 0)
             active_users = dao.get_all_active_students()
-            count = 0
             
+            count = 0
+
             for user in active_users:
                 if user.lives < 3:  # Восстанавливаем только если меньше максимума
                     user.lives = 3
                     count += 1
-            
+
             if count > 0:
                 session.commit()
                 logger.info(f"Восстановлены жизни для {count} студентов.")
