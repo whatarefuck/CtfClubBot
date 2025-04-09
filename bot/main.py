@@ -75,11 +75,10 @@ async def main():
         restore_student_lives,
         trigger=CronTrigger(
             day=10,  # Каждый день
-            hour=0,   # Полночь
+            hour=0,  # Полночь
             minute=0,
-            timezone=timezone('Europe/Moscow')
+            timezone=timezone("Europe/Moscow"),
         ),
-        
         id="restore_lives",
         name="Восстановление жизней студентов",
         replace_existing=True,
