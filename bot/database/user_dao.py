@@ -35,7 +35,6 @@ class UserDAO:
             self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
         )
 
-
     def get_all_active_students(self):
         return (
             self.session.query(User)
@@ -55,7 +54,6 @@ class UserDAO:
         :param tg_id: Телеграмм айди
         """
         return self.session.query(User).filter(User.tg_id == tg_id).first()
-
 
     def get_all_students_with_tasks(self):
         """Получить всех пользователей вместе с их заданиями"""
