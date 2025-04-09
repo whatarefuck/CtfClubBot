@@ -40,7 +40,7 @@ async def restore_student_lives():
             dao = UserDAO(session)
             # Получаем всех "живых" пользователей (HP > 0)
             active_users = dao.get_all_active_students()
-            
+
             count = 0
 
             for user in active_users:
