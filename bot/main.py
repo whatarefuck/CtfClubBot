@@ -5,7 +5,6 @@ import sentry_sdk
 from tasks import restore_student_lives
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 from pytz import timezone
 
 from aiogram import Bot, Dispatcher, types

@@ -8,8 +8,6 @@ from database.user_dao import UserDAO
 
 from utils.root_me import get_solved_tasks_of_student
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 
 logger = getLogger()
 
