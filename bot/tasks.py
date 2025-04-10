@@ -34,6 +34,12 @@ async def sync_education_tasks(bot: Bot):
                             logger.info(teacher_message)
                             notify = Notifications(bot)
                             await notify.say_about_deadline_fail(teacher_message)
+                            student_message = (
+                                f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, чтобы избежать потерь.\
+                                      Если у тебя есть вопросы или трудности, не стесняйся обращаться за помощью в общий чат."
+                            )
+                            logger.info(student_message)
+                            await notify._say_student(student_message)
 
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
