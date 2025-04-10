@@ -56,9 +56,7 @@ class Notifications:
         """Написать студенту о чем-то."""
         try:
             await self.bot.send_message(chat_id=student.tg_id, text=message)
-            logger.info(
-                f"Sent {message} to {student.full_name} - @{student.username}"
-            )
+            logger.info(f"Sent {message} to {student.full_name} - @{student.username}")
         except TelegramBadRequest:
             logger.warning(
                 f"Чат @{student.username} - {student.full_name} с не найден."
