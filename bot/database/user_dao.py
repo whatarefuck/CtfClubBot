@@ -38,7 +38,7 @@ class UserDAO:
     def get_all_active_students(self):
         return (
             self.session.query(User)
-            .filter(User.username, User.lives > 0)
+            .filter(User.username.isnot(None), User.lives > 0)
             .all()
         )
 
