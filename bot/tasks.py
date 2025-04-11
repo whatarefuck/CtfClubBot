@@ -5,6 +5,7 @@ from logging import getLogger
 from utils.notifications import Notifications
 from database.db import get_db
 from database.user_dao import UserDAO
+from database.task_dao import TaskDao
 
 from utils.root_me import get_solved_tasks_of_student
 
@@ -17,6 +18,8 @@ async def sync_education_tasks(bot: Bot):
         with get_db() as session:
             # Fetch all users with their tasks
             dao = UserDAO(session)
+            task_dao = TaskDao(session)
+            notify = Notifications(bot)
             users = dao.get_all_students_with_tasks()
             for user in users:
                 if user.root_me_nickname:
@@ -26,6 +29,17 @@ async def sync_education_tasks(bot: Bot):
                     )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
+                        if task.completed:
+                            score = task_dao.score_for_tasks(50 , decided_users(), all_users(), index_of_time())
+                            user.points += score
+                            student_message = (
+                                f" Молодец, ты решил задачу {task.name} и получил {score} очков"
+                            )
+                            admin_log = f" {user.username} - {user.full_name} решил задачу{task.name} и получил {score} очков "
+                            logger.info(admin_log)
+                            await notify._say_teachers(admin_log)
+                            await notify._say_student(student_message)
+
                         if not task.completed and task.is_expired:
                             user.lives -= 1
                             user.violations += 1
@@ -33,8 +47,9 @@ async def sync_education_tasks(bot: Bot):
                                 f"Задача {task.name} истек у студента {user}."
                             )
                             logger.info(teacher_message)
-                            notify = Notifications(bot)
+                            
                             await notify.say_about_deadline_fail(teacher_message)
+                        
 
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
