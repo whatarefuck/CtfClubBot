@@ -8,7 +8,7 @@ ENV_PATH = Path(__file__).parent.parent / ".env"
 
 class Config(BaseSettings):
     BOT_TOKEN: str = (
-        "8121070643:AAHfGqB0JoE9Pe8MwTCN5jGppY71ZMrFsvQ"  # your tg bot token from botfather
+        "7769863706:AAGu3kX2xPohshlaD7A8-0Sa0O7UgmLYb1M"  # your tg bot token from botfather
     )
     DATABASE_URL: str = "postgresql://ctf:ctf@localhost:5432/ctf"
     ADMIN_NICKNAMES: str = "tgadminnick1,tgadminnick2"
