@@ -73,3 +73,9 @@ class TaskDao:
             )
             .all()
         )
+    
+    def score_for_tasks(S_min, N, N_total, time):
+
+        R_time = min(time, 0.35)
+        score = max(S_min, 500 * (1- N / N_total) * (1 + R_time))
+        return(score)
