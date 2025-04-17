@@ -35,6 +35,19 @@ class UserDAO:
             self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
         )
 
+    def get_all_active_students(self):
+        return (
+            self.session.query(User)
+            .filter(User.username.isnot(None), User.lives > 0)
+            .all()
+        )
+
+    def get_user_id_by_username(self, username: str):
+        user = self.session.query(User).filter(User.username == username).first()
+        if user:
+            return user.id
+        return None
+
     def get_user_by_tg_id(self, tg_id: int) -> User:
         """Получить пользователя по его телеграм ID.
 

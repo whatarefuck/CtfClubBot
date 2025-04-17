@@ -2,6 +2,10 @@ import asyncio
 import logging
 import sentry_sdk
 
+from tasks import restore_student_lives
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from pytz import timezone
 
 from aiogram import Bot, Dispatcher, types
 
@@ -62,9 +66,29 @@ dp.message.middleware(AuthMiddleware())
 
 
 async def main():
+
+    scheduler = AsyncIOScheduler()
+    # Добавляем периодическую задачу восстановления жизней
+    # Выполняется каждое 10-е число месяца в 00:00 по МСК (UTC+3)
+    scheduler.add_job(
+        restore_student_lives,
+        trigger=CronTrigger(
+            day=10,  # Каждый день
+            hour=0,  # Полночь
+            minute=0,
+            timezone=timezone("Europe/Moscow"),
+        ),
+        id="restore_lives",
+        name="Восстановление жизней студентов",
+        replace_existing=True,
+    )
+
+    # Запускаем планировщик
+    scheduler.start()
+    await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
-    await bot.set_my_commands(commands)
+
     await dp.start_polling(bot)
 
 
