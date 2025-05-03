@@ -73,9 +73,52 @@ class TaskDao:
             )
             .all()
         )
-    
-    def score_for_tasks(S_min, N, N_total, time):
+
+    def score_for_tasks(self, S_min: int, N: int, N_total: int, time: float):
 
         R_time = min(time, 0.35)
-        score = max(S_min, 500 * (1- N / N_total) * (1 + R_time))
-        return(score)
+        score = max(S_min, 500 * (1 - N / N_total) * (1 + R_time))
+        return (score)
+
+    def decided_users(self, task_name: str):
+        completed_tasks = self.session.query(Task).filter(
+            Task.name == task_name,
+            Task.completed == True
+        ).all()
+        user_ids = {task.assigned_user_id for task in completed_tasks}
+        
+
+        return len(user_ids)
+
+    def all_users(self, task_name: str):
+        tasks = self.session.query(Task).filter(
+            Task.name == task_name,
+
+        ).all()
+        user_ids = {task.assigned_user_id for task in tasks}
+        
+        return len(user_ids)
+
+    def index_of_time(self, task_name: str, assigned_user_id: int):
+        task = self.session.query(Task).filter(
+            Task.name == task_name,
+            Task.assigned_user_id == assigned_user_id,
+            Task.completed == True
+        ).first()
+
+        if task is None or task.deadline is None:
+            return 0  # Задача не найдена или у задачи нет дедлайна
+
+        time_taken = datetime.now() - task.deadline
+        time_until_deadline = task.deadline - datetime.now()  # отрицательное, если просрочено
+
+        # Абсолютные значения времени в секундах
+        time_taken_sec = abs(time_taken.total_seconds())
+        time_until_deadline_sec = abs(time_until_deadline.total_seconds())
+
+        if time_taken_sec == 0:
+            return None  # избегаем деления на ноль
+
+        ratio = round(time_until_deadline_sec / time_taken_sec, 2)
+        
+        return ratio

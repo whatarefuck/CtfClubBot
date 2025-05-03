@@ -29,8 +29,17 @@ async def sync_education_tasks(bot: Bot):
                     )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
+                        
                         if task.completed:
-                            score = task_dao.score_for_tasks(50 , decided_users(), all_users(), index_of_time())
+                            s_min = 50
+                            print(task_dao.index_of_time(task.name, user.id))
+
+                            score = task_dao.score_for_tasks(
+                                s_min,
+                                task_dao.decided_users(task.name),
+
+                                task_dao.all_users(task.name),
+                                task_dao.index_of_time(task.name, user.id))
                             user.points += score
                             student_message = (
                                 f" Молодец, ты решил задачу {task.name} и получил {score} очков"
@@ -38,7 +47,7 @@ async def sync_education_tasks(bot: Bot):
                             admin_log = f" {user.username} - {user.full_name} решил задачу{task.name} и получил {score} очков "
                             logger.info(admin_log)
                             await notify._say_teachers(admin_log)
-                            await notify._say_student(student_message)
+                            await notify._say_student(user.username, student_message)
 
                         if not task.completed and task.is_expired:
                             user.lives -= 1
@@ -47,9 +56,8 @@ async def sync_education_tasks(bot: Bot):
                                 f"Задача {task.name} истек у студента {user}."
                             )
                             logger.info(teacher_message)
-                            
+
                             await notify.say_about_deadline_fail(teacher_message)
-                        
 
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
