@@ -73,3 +73,70 @@ class TaskDao:
             )
             .all()
         )
+
+    def decided_users(self, task_name: str):
+        completed_tasks = (
+            self.session.query(Task)
+            .filter(Task.name == task_name, Task.completed == True)
+            .all()
+        )
+        user_ids = {task.assigned_user_id for task in completed_tasks}
+
+        return len(user_ids)
+
+    def all_users(self, task_name: str):
+        tasks = (
+            self.session.query(Task)
+            .filter(
+                Task.name == task_name,
+            )
+            .all()
+        )
+        user_ids = {task.assigned_user_id for task in tasks}
+
+        return len(user_ids)
+
+    def index_of_time(self, task_name: str, assigned_user_id: int):
+        task = (
+            self.session.query(Task)
+            .filter(
+                Task.name == task_name,
+                Task.assigned_user_id == assigned_user_id,
+                Task.completed == True,
+            )
+            .first()
+        )
+
+        if task is None or task.deadline is None:
+            return 0  # Задача не найдена или у задачи нет дедлайна
+
+        time_taken = datetime.now() - task.deadline
+        time_until_deadline = (
+            task.deadline - datetime.now()
+        )  # отрицательное, если просрочено
+
+        # Абсолютные значения времени в секундах
+        time_taken_sec = abs(time_taken.total_seconds())
+        time_until_deadline_sec = abs(time_until_deadline.total_seconds())
+
+        if time_taken_sec == 0:
+            return None  # избегаем деления на ноль
+
+        ratio = round(time_until_deadline_sec / time_taken_sec, 2)
+
+        return ratio
+
+    def score_for_tasks(self, task_name: str, user_id: int):
+        from settings import Config
+
+        S_min = Config.s_min
+        N = self.decided_users(task_name)
+        N_total = self.all_users(task_name)
+        time_index = self.index_of_time(task_name, user_id)
+
+        if time_index is None:
+            return S_min  # если задача не выполнена или нет дедлайна
+
+        R_time = min(time_index, 0.35)
+        score = max(S_min, 500 * (1 - N / N_total) * (1 + R_time))
+        return score
