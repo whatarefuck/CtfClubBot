@@ -29,25 +29,20 @@ async def sync_education_tasks(bot: Bot):
                     )
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
-                        
+
                         if task.completed:
-                            s_min = 50
-                            print(task_dao.index_of_time(task.name, user.id))
+                            from settings import Config
 
-                            score = task_dao.score_for_tasks(
-                                s_min,
-                                task_dao.decided_users(task.name),
+                            notify = Notifications(bot)
 
-                                task_dao.all_users(task.name),
-                                task_dao.index_of_time(task.name, user.id))
+                            score = task_dao.score_for_tasks(task.name, user.id)
+
                             user.points += score
-                            student_message = (
-                                f" Молодец, ты решил задачу {task.name} и получил {score} очков"
-                            )
+                            student_message = f" Молодец, ты решил задачу {task.name} и получил {score} очков"
                             admin_log = f" {user.username} - {user.full_name} решил задачу{task.name} и получил {score} очков "
                             logger.info(admin_log)
                             await notify._say_teachers(admin_log)
-                            await notify._say_student(user.username, student_message)
+                            await notify._say_student(user, student_message)
 
                         if not task.completed and task.is_expired:
                             user.lives -= 1

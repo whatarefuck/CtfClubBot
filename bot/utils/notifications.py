@@ -55,7 +55,7 @@ class Notifications:
     async def _say_student(self, student: User, message: str):
         """Написать студенту о чем-то."""
         try:
-            await self.bot.send_message(chat_id=student.tg_id, text=message)
+            await self.bot.send_message(text=message, chat_id=student.tg_id)
             logger.info(f"Sent {message} to {student.full_name} - @{student.username}")
         except TelegramBadRequest:
             logger.warning(
