@@ -58,6 +58,7 @@ async def restore_student_lives():
                 if user.lives < 3:  # Восстанавливаем только если меньше максимума
                     user.lives = 3
                     logger.info(f"Здоровье {user.username} = 3")
+
                     count += 1
 
             if count > 0:
