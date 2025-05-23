@@ -29,7 +29,7 @@ async def sync_education_tasks(bot: Bot):
                             user.lives -= 1
                             user.violations += 1
                             teacher_message = (
-                                f"Задача {task.name} истек у студента {user}."
+                                f"Задача {task.name} истека у студента {user}."
                             )
                             logger.info(teacher_message)
                             notify = Notifications(bot)
@@ -37,7 +37,7 @@ async def sync_education_tasks(bot: Bot):
                             student_message = f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, чтобы избежать потерь.\
                                       Если у тебя есть вопросы или трудности, не стесняйся обращаться за помощью в общий чат."
                             logger.info(student_message)
-                            await notify._say_student(student_message)
+                            await notify._say_student(user, student_message)
 
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
