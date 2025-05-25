@@ -89,7 +89,6 @@ async def main():
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
 
-
     await dp.start_polling(bot)
 
 
