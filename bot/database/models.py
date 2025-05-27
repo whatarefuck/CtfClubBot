@@ -35,6 +35,7 @@ class Task(Base):
     assigned_user_id = Column(Integer, ForeignKey("users.id"))
     completed = Column(Boolean, default=False)
     url = Column(String)
+    violation_recorded = Column(Boolean, nullable=True)  
 
     assigned_user = relationship("User", back_populates="tasks")
 
