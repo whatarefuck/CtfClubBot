@@ -49,7 +49,6 @@ class UserDAO:
             return user.id
         return None
 
-
     def get_user_by_tg_id(self, tg_id: int) -> User:
         """Получить пользователя по его телеграм ID.
 
