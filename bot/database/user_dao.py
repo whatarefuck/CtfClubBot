@@ -13,15 +13,28 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
+    def get_by_id(self, user_id: int) -> User | None:
+        """
+        Возвращает пользователя по его внутреннему ID (PK) или None,
+        чтобы можно было получить актуальные данные из БД.
+        """
+        return (
+            self.session
+            .query(User)
+            .filter(User.id == user_id)
+            .one_or_none()
+        )
+
     def create_user(
         self, username: str, full_name: str, root_me_nickname: str, tg_id: int
-    ):
-        """Create user in self.session at /start"""
+    ) -> User:
+        """Создаёт нового пользователя при /start."""
         new_user = User(
             tg_id=tg_id,
             username=username,
             full_name=full_name,
             root_me_nickname=root_me_nickname,
+            # points и lives подхватят default из модели
         )
         self.session.add(new_user)
         self.session.commit()
@@ -29,36 +42,40 @@ class UserDAO:
         return new_user
 
     def get_all_students(self) -> list[User]:
-        """Get all students excluding specific users"""
-
-        return (
-            self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
-        )
-
-    def get_all_active_students(self):
+        """Получить всех студентов (исключая учителей по tg_id)."""
         return (
             self.session.query(User)
+            .filter(User.tg_id.notin_(config.teacher_ids))
+            .all()
+        )
 
+    def get_all_active_students(self) -> list[User]:
+        """Получить всех студентов с живыми (lives > 0) и имеющих username."""
+        return (
+            self.session.query(User)
             .filter(User.username.isnot(None), User.lives > 0)
             .all()
         )
 
-    def get_user_id_by_username(self, username: str):
-        user = self.session.query(User).filter(User.username == username).first()
-        if user:
-            return user.id
-        return None
+    def get_user_id_by_username(self, username: str) -> int | None:
+        """Вернуть внутренний ID пользователя по username или None."""
+        user = (
+            self.session.query(User)
+            .filter(User.username == username)
+            .first()
+        )
+        return user.id if user else None
 
-    def get_user_by_tg_id(self, tg_id: int) -> User:
-        """Получить пользователя по его телеграм ID.
+    def get_user_by_tg_id(self, tg_id: int) -> User | None:
+        """Получить пользователя по его Telegram ID."""
+        return (
+            self.session.query(User)
+            .filter(User.tg_id == tg_id)
+            .first()
+        )
 
-        :param tg_id: Телеграмм айди
-        """
-        return self.session.query(User).filter(User.tg_id == tg_id).first()
-
-    def get_all_students_with_tasks(self):
-        """Получить всех пользователей вместе с их заданиями"""
-
+    def get_all_students_with_tasks(self) -> list[User]:
+        """Получить всех студентов вместе с их невыполненными заданиями."""
         users = (
             self.session.query(User)
             .filter(User.tg_id.notin_(config.teacher_ids))
@@ -70,23 +87,28 @@ class UserDAO:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
 
-    def heal(self, user: User):
-        """Обменять 10 опыта на 1 HP."""
-
+    def heal(self, user: User) -> None:
+        """Обменять 10 опыта на 3 жизни."""
         user.lives += 3
         user.points -= 10
-
         self.session.commit()
         self.session.refresh(user)
 
-    def get_teachers(self):
-        """Получить всех старшекурсников."""
+    def get_teachers(self) -> list[User]:
+        """Получить всех учителей (старшекурсников) по tg_id."""
         teachers = (
-            self.session.query(User).filter(User.tg_id.in_(config.teacher_ids)).all()
+            self.session.query(User)
+            .filter(User.tg_id.in_(config.teacher_ids))
+            .all()
         )
-        logger.info(f"Получены учителя - {teachers}")
+        logger.info(f"Получены учителя: {teachers}")
         return teachers
 
-    def leaderboard(self):
-        """Извлекаем всех студентов, сортируя по убыванию баллов."""
-        return self.session.query(User).order_by(User.points.desc()).limit(20).all()
+    def leaderboard(self, limit: int = 20) -> list[User]:
+        """Извлечь топ-`limit` пользователей, сортируя по убыванию points."""
+        return (
+            self.session.query(User)
+            .order_by(User.points.desc())
+            .limit(limit)
+            .all()
+        )
