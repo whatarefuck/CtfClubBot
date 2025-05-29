@@ -1,3 +1,4 @@
+from typing import Optional, List  # Добавляем Optional и List
 from database.models import User
 from settings import config
 from sqlalchemy.orm import joinedload
@@ -13,7 +14,7 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
-    def get_by_id(self, user_id: int) -> User | None:
+    def get_by_id(self, user_id: int) -> Optional[User]:
         """
         Возвращает пользователя по его внутреннему ID (PK) или None,
         чтобы можно было получить актуальные данные из БД.
@@ -41,7 +42,7 @@ class UserDAO:
         self.session.refresh(new_user)
         return new_user
 
-    def get_all_students(self) -> list[User]:
+    def get_all_students(self) -> List[User]:
         """Получить всех студентов (исключая учителей по tg_id)."""
         return (
             self.session.query(User)
@@ -49,7 +50,7 @@ class UserDAO:
             .all()
         )
 
-    def get_all_active_students(self) -> list[User]:
+    def get_all_active_students(self) -> List[User]:
         """Получить всех студентов с живыми (lives > 0) и имеющих username."""
         return (
             self.session.query(User)
@@ -57,7 +58,7 @@ class UserDAO:
             .all()
         )
 
-    def get_user_id_by_username(self, username: str) -> int | None:
+    def get_user_id_by_username(self, username: str) -> Optional[int]:
         """Вернуть внутренний ID пользователя по username или None."""
         user = (
             self.session.query(User)
@@ -66,7 +67,7 @@ class UserDAO:
         )
         return user.id if user else None
 
-    def get_user_by_tg_id(self, tg_id: int) -> User | None:
+    def get_user_by_tg_id(self, tg_id: int) -> Optional[User]:
         """Получить пользователя по его Telegram ID."""
         return (
             self.session.query(User)
@@ -74,7 +75,7 @@ class UserDAO:
             .first()
         )
 
-    def get_all_students_with_tasks(self) -> list[User]:
+    def get_all_students_with_tasks(self) -> List[User]:
         """Получить всех студентов вместе с их невыполненными заданиями."""
         users = (
             self.session.query(User)
@@ -94,7 +95,7 @@ class UserDAO:
         self.session.commit()
         self.session.refresh(user)
 
-    def get_teachers(self) -> list[User]:
+    def get_teachers(self) -> List[User]:
         """Получить всех учителей (старшекурсников) по tg_id."""
         teachers = (
             self.session.query(User)
@@ -104,7 +105,7 @@ class UserDAO:
         logger.info(f"Получены учителя: {teachers}")
         return teachers
 
-    def leaderboard(self, limit: int = 20) -> list[User]:
+    def leaderboard(self, limit: int = 20) -> List[User]:
         """Извлечь топ-`limit` пользователей, сортируя по убыванию points."""
         return (
             self.session.query(User)
