@@ -31,7 +31,6 @@ async def sync_education_tasks(bot: Bot):
                         task.completed = task.name in solved_tasks
 
                         if task.completed:
-                            from settings import Config
 
                             notify = Notifications(bot)
 
