@@ -16,9 +16,7 @@ with get_db() as db:
     CompetitionDAO = CompetitionDao(db)
 
 
-    EVENTS = CompetitionDAO.get_all_competition()
-    
-    #список всех событий
+    EVENTS = CompetitionDAO.get_all_competition()#список всех событий
     
 
     STUDENTS = UserDao.get_all_students()
