@@ -77,7 +77,7 @@ class UserDAO:
 
     def heal(self, user: User) -> None:
         """Обменять 10 опыта на 3 жизни."""
-        user.lives += 1
+        user.lives += 3
         user.points -= 10
         self.session.commit()
         self.session.refresh(user)
