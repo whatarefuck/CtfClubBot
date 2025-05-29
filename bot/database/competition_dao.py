@@ -29,8 +29,6 @@ class CompetitionDao:
         self.session.commit()
         self.session.refresh(new_competition)
         return new_competition
-    
-    def get_all_competition( self ):
-        return (
-            self.session.query(Competition).all()
-        )
+
+    def get_all_competition(self):
+        return self.session.query(Competition).all()
