@@ -1,4 +1,4 @@
-from typing import Optional, List  # Добавляем Optional и List
+from typing import Optional, List
 from database.models import User
 from settings import config
 from sqlalchemy.orm import joinedload
@@ -14,18 +14,6 @@ class UserDAO:
     def __init__(self, session):
         self.session = session
 
-    def get_by_id(self, user_id: int) -> Optional[User]:
-        """
-        Возвращает пользователя по его внутреннему ID (PK) или None,
-        чтобы можно было получить актуальные данные из БД.
-        """
-        return (
-            self.session
-            .query(User)
-            .filter(User.id == user_id)
-            .one_or_none()
-        )
-
     def create_user(
         self, username: str, full_name: str, root_me_nickname: str, tg_id: int
     ) -> User:
@@ -35,7 +23,6 @@ class UserDAO:
             username=username,
             full_name=full_name,
             root_me_nickname=root_me_nickname,
-            # points и lives подхватят default из модели
         )
         self.session.add(new_user)
         self.session.commit()
@@ -90,7 +77,7 @@ class UserDAO:
 
     def heal(self, user: User) -> None:
         """Обменять 10 опыта на 3 жизни."""
-        user.lives += 3
+        user.lives += 1
         user.points -= 10
         self.session.commit()
         self.session.refresh(user)
