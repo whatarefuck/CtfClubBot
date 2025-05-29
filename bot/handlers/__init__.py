@@ -6,3 +6,4 @@ from .deadlines import missed_deadlines_router
 from .heal import heal_router
 from .leaderboard import leaderboard_router
 from .profiles import my_profile_router
+from .marking_students import mark_students_router
