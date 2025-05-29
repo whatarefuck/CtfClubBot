@@ -2,7 +2,9 @@ from database.db import get_db
 from database.models import User
 from logging import getLogger
 
+
 logger = getLogger(__name__)
+
 
 def reset_all_user_points():
     with get_db() as db:
@@ -15,6 +17,7 @@ def reset_all_user_points():
         users = db.query(User).all()
         for user in users:
             logger.info(f"User @{user.username}: {user.points} points")
+
 
 if __name__ == "__main__":
     reset_all_user_points()

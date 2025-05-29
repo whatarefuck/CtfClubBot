@@ -4,7 +4,6 @@ from aiogram.types import Message
 from database.db import get_db
 from database.user_dao import UserDAO
 from database.models import User
-from settings import config  # Добавляем импорт config
 from logging import getLogger
 
 logger = getLogger(__name__)
