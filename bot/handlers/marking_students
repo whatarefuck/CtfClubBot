@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.user_dao import UserDAO
+from database.competition_dao import CompetitionDao
 from database.db import get_db
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
@@ -12,8 +13,12 @@ router = Router()
 
 with get_db() as db:
     UserDao = UserDAO(db)
+    CompetitionDAO = CompetitionDao(db)
 
-    EVENTS = None #список всех событий
+
+    EVENTS = CompetitionDAO.get_all_competition()
+    
+    #список всех событий
     
 
     STUDENTS = UserDao.get_all_students()
