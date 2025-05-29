@@ -11,6 +11,46 @@ logger = getLogger(__name__)
 leaderboard_router = Router()
 
 
+def format_top_rating(top_rating: list[User]) -> list[str]:
+    """Формирует строки для топ-20 пользователей."""
+    messages = ["🏆 Лидеры (Топ-20):"]
+    if not top_rating:
+        messages.append("Пока что никто не заработал баллов в топ-20.")
+    else:
+        for idx, top_user in enumerate(top_rating, start=1):
+            messages.append(f"{idx}. @{top_user.username} — {top_user.points} баллов")
+    return messages
+
+
+def format_all_users(all_users: list[User]) -> list[str]:
+    """Формирует строки для всех пользователей."""
+    messages = ["\n📋 Все пользователи:"]
+    if not all_users:
+        messages.append("Нет пользователей.")
+    else:
+        for user in all_users:
+            messages.append(f"@{user.username} — {user.points} баллов")
+    return messages
+
+
+def format_user_status(current_user: User, top_rating: list[User]) -> list[str]:
+    """Формирует статус текущего пользователя."""
+    messages = []
+    in_top = any(top_user.id == current_user.id for top_user in top_rating)
+    if in_top and current_user.points > 0:
+        messages.append(f"\n🎉 Поздравляем! Вы в топ-{len(top_rating)}!")
+    else:
+        if current_user.points == 0:
+            messages.append("\n😔 Вы ещё не заработали баллов. Решайте задачи, чтобы попасть в топ!")
+        else:
+            top_score = top_rating[0].points if top_rating else 0
+            needed = top_score - current_user.points + 1
+            messages.append(
+                f"\n😔 Вас нет в топе. Чтобы попасть на первое место, вам осталось заработать {needed} балл(ов)."
+            )
+    return messages
+
+
 @leaderboard_router.message(Command("leaderboard"))
 async def leaderboard_handler(message: Message, user: User):
     """
@@ -36,35 +76,9 @@ async def leaderboard_handler(message: Message, user: User):
         all_users = user_dao.get_all_students()
 
         # Формируем сообщение
-        leaderboard_message = ["🏆 Лидеры (Топ-20):"]
-        if not top_rating:
-            leaderboard_message.append("Пока что никто не заработал баллов в топ-20.")
-        else:
-            for idx, top_user in enumerate(top_rating, start=1):
-                leaderboard_message.append(f"{idx}. @{top_user.username} — {top_user.points} баллов")
-
-        # Показываем всех пользователей, включая с 0 баллов
-        leaderboard_message.append("\n📋 Все пользователи:")
-        if not all_users:
-            leaderboard_message.append("Нет пользователей.")
-        else:
-            for user in all_users:
-                leaderboard_message.append(f"@{user.username} — {user.points} баллов")
-
-        # Проверяем, есть ли текущий пользователь в топ-20 (и у него > 0 баллов)
-        in_top = any(top_user.id == current_user.id for top_user in top_rating)
-        if in_top and current_user.points > 0:
-            leaderboard_message.append(f"\n🎉 Поздравляем! Вы в топ-{len(top_rating)}!")
-        else:
-            if current_user.points == 0:
-                leaderboard_message.append(
-                    "\n😔 Вы ещё не заработали баллов. Решайте задачи, чтобы попасть в топ!"
-                )
-            else:
-                top_score = top_rating[0].points if top_rating else 0
-                needed = top_score - current_user.points + 1
-                leaderboard_message.append(
-                    f"\n😔 Вас нет в топе. Чтобы попасть на первое место, вам осталось заработать {needed} балл(ов)."
-                )
+        leaderboard_message = []
+        leaderboard_message.extend(format_top_rating(top_rating))
+        leaderboard_message.extend(format_all_users(all_users))
+        leaderboard_message.extend(format_user_status(current_user, top_rating))
 
         await message.answer("\n".join(leaderboard_message))
