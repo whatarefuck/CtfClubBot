@@ -146,7 +146,7 @@ async def final_confirmation(callback: CallbackQuery):
     try:
         with get_db() as db:
             participation_dao = ParticipationDAO(db)
-            await participation_dao.mark_participation(
+            participation_dao.mark_participation(
                 user_data["event_id"], list(user_data["selected"])
             )
 
