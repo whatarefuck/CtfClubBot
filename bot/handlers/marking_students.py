@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.user_dao import UserDAO
 from database.competition_dao import CompetitionDao
+from database.Participationdao import ParticipationDAO
 from database.db import get_db
 
 mark_students_router = Router()
@@ -142,18 +143,19 @@ async def confirm_selection(callback: CallbackQuery):
 async def final_confirmation(callback: CallbackQuery):
     user_data = user_selections[callback.from_user.id]
 
-    # Здесь должна быть логика сохранения в БД
-    # Например:
-    # with get_db() as db:
-    #     ParticipationDAO(db).mark_participation(
-    #         user_data['event_id'],
-    #         list(user_data['selected'])
-    #     )
+    try:
+        with get_db() as db:
+            participation_dao = ParticipationDAO(db)
+            await participation_dao.mark_participation(
+                user_data["event_id"], list(user_data["selected"])
+            )
 
-    await callback.message.edit_text(
-        f"Готово! {len(user_data['selected'])} студентов отмечены на мероприятии \"{user_data['competition_name']}\"."
-    )
-    del user_selections[callback.from_user.id]
+        await callback.message.edit_text(
+            f"Готово! {len(user_data['selected'])} студентов отмечены на мероприятии \"{user_data['competition_name']}\"."
+        )
+        del user_selections[callback.from_user.id]
+    except Exception as e:
+        await callback.answer(f"Ошибка: {str(e)}")
 
 
 @mark_students_router.callback_query(F.data == "cancel")
