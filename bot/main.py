@@ -67,7 +67,6 @@ dp.message.middleware(AuthMiddleware())
 
 
 async def main():
-
     scheduler = AsyncIOScheduler()
     # Добавляем периодическую задачу восстановления жизней
     # Выполняется каждое 10-е число месяца в 00:00 по МСК (UTC+3)
@@ -83,8 +82,6 @@ async def main():
         name="Восстановление жизней студентов",
         replace_existing=True,
     )
-
-    
     scheduler.add_job(
         send_event_notifications,
         args=[bot],
@@ -102,8 +99,8 @@ async def main():
     await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
-
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

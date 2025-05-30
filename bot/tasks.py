@@ -77,6 +77,7 @@ async def restore_student_lives():
     except Exception as e:
         logger.error(f"Ошибка при восстановлении жизней: {e}")
 
+
 async def send_event_notifications(bot: Bot):
     """Отправка уведомлений о событиях за 1 день и в день мероприятия."""
     try:
@@ -86,24 +87,21 @@ async def send_event_notifications(bot: Bot):
         today_end = today_start + timedelta(days=1)
         tomorrow_start = today_start + timedelta(days=1)
         tomorrow_end = today_start + timedelta(days=2)
-        
         with get_db() as session:
             dao = CompetitionDao(session)
             today_events = dao.get_events_between(today_start, today_end)
             tomorrow_events = dao.get_events_between(tomorrow_start, tomorrow_end)
-            
             for event in today_events:
                 logger.info(f"Уведомление о событии сегодня: {event.name}")
                 # Здесь можно добавить отправку через bot, например:
                 # await bot.send_message(chat_id, f"Сегодня: {event.name} в {event.date}")
-            
             for event in tomorrow_events:
                 logger.info(f"Уведомление о событии завтра: {event.name}")
                 # Здесь можно добавить отправку через bot, например:
                 # await bot.send_message(chat_id, f"Завтра: {event.name} в {event.date}")
-                
     except Exception as e:
         logger.error(f"Ошибка при отправке уведомлений: {e}")
+
 
 if __name__ == "__main__":
     asyncio.run(sync_education_tasks())
