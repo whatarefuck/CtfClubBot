@@ -18,6 +18,7 @@ from handlers import (
     heal_router,
     leaderboard_router,
     my_profile_router,
+    mark_students_router,
 )
 from settings import config
 from middlewares import AuthMiddleware
@@ -45,6 +46,7 @@ commands = [
 
 dp.include_routers(
     start_router,
+    mark_students_router,
     add_task_router,
     add_competition_router,
     my_tasks_router,
@@ -90,6 +92,7 @@ async def main():
     asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
 
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

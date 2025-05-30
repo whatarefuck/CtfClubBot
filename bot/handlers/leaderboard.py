@@ -32,13 +32,13 @@ def format_user_status(user: User, top_rating: list[User]) -> list[str]:
         messages.append(f"🎉 Вы на {rank}-м месте в топ-20!")
     else:
         if user.points == 0:
-            messages.append("😔 У вас пока нет баллов. Решайте задачи, чтобы попасть в топ!")
+            messages.append(
+                "😔 У вас пока нет баллов. Решайте задачи, чтобы попасть в топ!"
+            )
         else:
             last_top_score = top_rating[-1].points if top_rating else 0
             needed = last_top_score - user.points + 1
-            messages.append(
-                f"👉 Чтобы войти в топ-20, нужно ещё {needed} балл(ов)."
-            )
+            messages.append(f"👉 Чтобы войти в топ-20, нужно ещё {needed} балл(ов).")
     return messages
 
 
