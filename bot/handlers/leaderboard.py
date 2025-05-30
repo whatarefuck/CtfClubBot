@@ -1,40 +1,62 @@
 from aiogram import Router
 from aiogram.filters.command import Command
 from aiogram.types import Message
-
 from database.db import get_db
-
-
 from database.user_dao import UserDAO
 from database.models import User
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 leaderboard_router = Router()
 
 
+def format_top_rating(top_rating: list[User]) -> list[str]:
+    """Формирует строки для топ-20 пользователей."""
+    messages = ["🏆 Лидеры (Топ-20):"]
+    if not top_rating:
+        messages.append("Пока что никто не заработал баллов в топ-20.")
+    else:
+        for idx, top_user in enumerate(top_rating, start=1):
+            messages.append(f"{idx}. @{top_user.username} — {top_user.points} баллов")
+    return messages
+
+
+def format_user_status(user: User, top_rating: list[User]) -> list[str]:
+    """Формирует статус текущего пользователя."""
+    messages = []
+    in_top = any(top_user.id == user.id for top_user in top_rating)
+    messages.append(f"\n📊 Ваш статус: @{user.username} — {user.points} баллов")
+    if in_top and user.points > 0:
+        rank = next((i + 1 for i, u in enumerate(top_rating) if u.id == user.id), 0)
+        messages.append(f"🎉 Вы на {rank}-м месте в топ-20!")
+    else:
+        if user.points == 0:
+            messages.append("😔 У вас пока нет баллов. Решайте задачи, чтобы попасть в топ!")
+        else:
+            last_top_score = top_rating[-1].points if top_rating else 0
+            needed = last_top_score - user.points + 1
+            messages.append(
+                f"👉 Чтобы войти в топ-20, нужно ещё {needed} балл(ов)."
+            )
+    return messages
+
+
 @leaderboard_router.message(Command("leaderboard"))
 async def leaderboard_handler(message: Message, user: User):
+    """
+    Показывает топ-20 пользователей по очкам и статус текущего пользователя.
+    """
     with get_db() as db:
         user_dao = UserDAO(db)
-        rating = user_dao.leaderboard()
-        if not rating:
-            await message.answer("Пока что никто не заработал баллов, рейтинга нет.")
-            return
 
-        leaderboard_message = "🏆 Лидеры:\n"
-        for idx, top_user in enumerate(rating, start=1):
-            leaderboard_message += f"{idx}. @{top_user.username} - {top_user.points}\n"
+        logger.info(f"Пользователь @{user.username} имеет {user.points} баллов")
 
-        # Check if current user is in the top ratings by username
-        current_username = message.from_user.username
-        user_in_top = any(top_user.username == current_username for top_user in rating)
+        # Получаем топ-20 пользователей (только с ненулевыми баллами)
+        top_rating = [u for u in user_dao.leaderboard(limit=20) if u.points > 0]
 
-        if user_in_top:
-            leaderboard_message += "Поздравляем! Вы в топ-20!"
-        else:
-            # If rating is not empty, calculate points needed
-            points_needed = (
-                max(top_user.points for top_user in rating) - user.points + 1
-            )
-            leaderboard_message += f"Тебя нет в топе. Не расстраивайся, тебе осталось заработать всего {points_needed}"
+        # Формируем сообщение
+        leaderboard_message = format_top_rating(top_rating)
+        leaderboard_message.extend(format_user_status(user, top_rating))
 
-    await message.answer(leaderboard_message)
+        await message.answer("\n".join(leaderboard_message))
