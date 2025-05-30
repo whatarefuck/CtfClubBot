@@ -1,9 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
-from datetime import datetime
 from database.models import Participation
-from database.models import User
-from database.models import Competition
 
 
 class ParticipationDAO:
