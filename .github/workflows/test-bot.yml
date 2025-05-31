@@ -25,57 +25,54 @@ jobs:
           --health-retries 5
 
     steps:
-    # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Python environment
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9' # Use your bot's Python version
+        python-version: '3.9'
 
-    # Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install flake8
+        pip install flake8 python-dotenv
 
-    # Run flake8 for linting
     - name: Run flake8
       run: flake8 .
 
-    # Wait for PostgreSQL to be ready
     - name: Wait for PostgreSQL
       run: |
         for i in {1..10}; do
           pg_isready -h localhost -p 5432 -U ctf && break
-          echo "Waiting for PostgreSQL to be ready..."
+          echo "Ожидание готовности PostgreSQL..."
           sleep 5
         done
 
-    # Apply SQLAlchemy migrations
+    - name: Create .env file
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      run: |
+        echo "BOT_TOKEN=$BOT_TOKEN" > bot/.env
+
     - name: Run migrations
       env:
         DATABASE_URL: postgresql://ctf:ctf@localhost:5432/ctf
       run: |
         alembic upgrade head
 
-    # Run the bot in test mode
     - name: Run bot test
       env:
         DATABASE_URL: postgresql://ctf:ctf@localhost:5432/ctf
       run: |
         python3 bot/main.py &
         BOT_PID=$!
-        sleep 10 # Allow some time for the bot to initialize
-        # Add your custom test commands here
-        ps -p $BOT_PID && echo "Bot is running successfully"
+        sleep 10
+        ps -p $BOT_PID && echo "Бот успешно запущен"
       shell: bash
 
-    # Ensure the bot process is terminated
     - name: Cleanup
       if: always()
       run: |
-        kill $BOT_PID || echo "No process to kill"
+        kill $BOT_PID || echo "Нет процесса для завершения"
