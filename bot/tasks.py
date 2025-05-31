@@ -1,11 +1,14 @@
 import asyncio
+from datetime import datetime, timedelta
 from aiogram import Bot
 from logging import getLogger
+from pytz import timezone
 
 from utils.notifications import Notifications
 from database.db import get_db
 from database.user_dao import UserDAO
 
+from database.competition_dao import CompetitionDao
 from utils.root_me import get_solved_tasks_of_student
 
 
@@ -73,6 +76,31 @@ async def restore_student_lives():
                 logger.info("Нет студентов, нуждающихся в восстановлении жизней.")
     except Exception as e:
         logger.error(f"Ошибка при восстановлении жизней: {e}")
+
+
+async def send_event_notifications(bot: Bot):
+    """Отправка уведомлений о событиях за 1 день и в день мероприятия."""
+    try:
+        moscow_tz = timezone('Europe/Moscow')
+        now = datetime.now(moscow_tz)
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+        tomorrow_start = today_start + timedelta(days=1)
+        tomorrow_end = today_start + timedelta(days=2)
+        with get_db() as session:
+            dao = CompetitionDao(session)
+            today_events = dao.get_events_between(today_start, today_end)
+            tomorrow_events = dao.get_events_between(tomorrow_start, tomorrow_end)
+            for event in today_events:
+                logger.info(f"Уведомление о событии сегодня: {event.name}")
+                # Здесь можно добавить отправку через bot, например:
+                # await bot.send_message(chat_id, f"Сегодня: {event.name} в {event.date}")
+            for event in tomorrow_events:
+                logger.info(f"Уведомление о событии завтра: {event.name}")
+                # Здесь можно добавить отправку через bot, например:
+                # await bot.send_message(chat_id, f"Завтра: {event.name} в {event.date}")
+    except Exception as e:
+        logger.error(f"Ошибка при отправке уведомлений: {e}")
 
 
 if __name__ == "__main__":
