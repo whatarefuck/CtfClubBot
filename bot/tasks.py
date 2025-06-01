@@ -44,12 +44,17 @@ async def sync_education_tasks(bot: Bot):
                             await notify._say_teachers(admin_log)
                             await notify._say_student(user, student_message)
 
-
-                        if not task.completed and task.is_expired and not task.violation_recorded:
+                        if (
+                            not task.completed
+                            and task.is_expired
+                            and not task.violation_recorded
+                        ):
 
                             user.lives -= 1
                             user.violations += 1
-                            task.violation_recorded = True  # Отмечаем, что нарушение обработано
+                            task.violation_recorded = (
+                                True  # Отмечаем, что нарушение обработано
+                            )
                             teacher_message = (
                                 f"Задача {task.name} истека у студента {user}."
                             )
