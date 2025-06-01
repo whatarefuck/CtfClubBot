@@ -44,15 +44,22 @@ async def sync_education_tasks(bot: Bot):
                             await notify._say_teachers(admin_log)
                             await notify._say_student(user, student_message)
 
-                        if not task.completed and task.is_expired:
+
+                        if not task.completed and task.is_expired and not task.violation_recorded:
+
                             user.lives -= 1
                             user.violations += 1
+                            task.violation_recorded = True  # Отмечаем, что нарушение обработано
                             teacher_message = (
-                                f"Задача {task.name} истек у студента {user}."
+                                f"Задача {task.name} истека у студента {user}."
                             )
                             logger.info(teacher_message)
 
                             await notify.say_about_deadline_fail(teacher_message)
+                            student_message = f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, чтобы избежать потерь.\
+                                      Если у тебя есть вопросы или трудности, не стесняйся обращаться за помощью в общий чат."
+                            logger.info(student_message)
+                            await notify._say_student(user, student_message)
 
                     session.commit()
                     logger.info(f"Synced tasks for user: {user.username}")
@@ -76,6 +83,7 @@ async def restore_student_lives():
                 if user.lives < 3:  # Восстанавливаем только если меньше максимума
                     user.lives = 3
                     logger.info(f"Здоровье {user.username} = 3")
+
                     count += 1
 
             if count > 0:
