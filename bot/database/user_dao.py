@@ -32,9 +32,7 @@ class UserDAO:
     def get_all_students(self) -> List[User]:
         """Получить всех студентов (исключая учителей по tg_id)."""
         return (
-            self.session.query(User)
-            .filter(User.tg_id.notin_(config.teacher_ids))
-            .all()
+            self.session.query(User).filter(User.tg_id.notin_(config.teacher_ids)).all()
         )
 
     def get_all_active_students(self) -> List[User]:
@@ -47,20 +45,12 @@ class UserDAO:
 
     def get_user_id_by_username(self, username: str) -> Optional[int]:
         """Вернуть внутренний ID пользователя по username или None."""
-        user = (
-            self.session.query(User)
-            .filter(User.username == username)
-            .first()
-        )
+        user = self.session.query(User).filter(User.username == username).first()
         return user.id if user else None
 
     def get_user_by_tg_id(self, tg_id: int) -> Optional[User]:
         """Получить пользователя по его Telegram ID."""
-        return (
-            self.session.query(User)
-            .filter(User.tg_id == tg_id)
-            .first()
-        )
+        return self.session.query(User).filter(User.tg_id == tg_id).first()
 
     def get_all_students_with_tasks(self) -> List[User]:
         """Получить всех студентов вместе с их невыполненными заданиями."""
@@ -85,18 +75,11 @@ class UserDAO:
     def get_teachers(self) -> List[User]:
         """Получить всех учителей (старшекурсников) по tg_id."""
         teachers = (
-            self.session.query(User)
-            .filter(User.tg_id.in_(config.teacher_ids))
-            .all()
+            self.session.query(User).filter(User.tg_id.in_(config.teacher_ids)).all()
         )
         logger.info(f"Получены учителя: {teachers}")
         return teachers
 
     def leaderboard(self, limit: int = 20) -> List[User]:
         """Извлечь топ-`limit` пользователей, сортируя по убыванию points."""
-        return (
-            self.session.query(User)
-            .order_by(User.points.desc())
-            .limit(limit)
-            .all()
-        )
+        return self.session.query(User).order_by(User.points.desc()).limit(limit).all()
