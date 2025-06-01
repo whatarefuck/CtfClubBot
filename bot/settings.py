@@ -24,8 +24,7 @@ class Config(BaseSettings):
 
     s_min = 50
     HEAL_LIMIT: int = 3
-
-
+    
     @property
     def teacher_ids(self):
         return self._teacher_ids.split(",")
@@ -33,7 +32,6 @@ class Config(BaseSettings):
     class Config:
         env_file = ENV_PATH
         extra = "allow"  # Разрешить дополнительные параметры
-
 
 # Instantiate the config
 config = Config()
