@@ -34,7 +34,7 @@ async def sync_education_tasks(bot: Bot):
                             user.lives -= 1
                             user.violations += 1
                             task.violation_recorded = (
-                                True  # Отмечаем, что нарушение обработано
+                                True
                             )
                             teacher_message = (
                                 f"Задача {task.name} истека у студента {user}."

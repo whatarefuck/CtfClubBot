@@ -42,6 +42,7 @@ commands = [
         command="/missed_deadlines", description="Посмотреть пропущенные дедлайны"
     ),
     types.BotCommand(command="/add_competition", description="Создать мероприятие"),
+    types.BotCommand(command="/mark_students", description="Отметить присутствующих"),
 ]
 
 dp.include_routers(
