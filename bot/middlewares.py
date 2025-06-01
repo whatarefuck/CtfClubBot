@@ -54,10 +54,10 @@ class AuthMiddleware(BaseMiddleware):
                 return
 
             data["user"] = user
-        
+
         # Список админских команд
         admin_commands = ["/add_competition", "/mark_students", "/add_task"]
-        
+
         # Если команда админская, проверяем права
         if event.text and any(event.text.startswith(cmd) for cmd in admin_commands):
             teacher_ids = [int(id) for id in Config()._teacher_ids.split(",")]

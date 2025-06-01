@@ -16,6 +16,7 @@ with get_db() as db:
     UserDao = UserDAO(db)
     CompetitionDAO = CompetitionDao(db)
 
+
 @mark_students_router.message(Command("mark_students"))
 async def show_events(message: Message, state: FSMContext):
     builder = InlineKeyboardBuilder()
@@ -26,11 +27,14 @@ async def show_events(message: Message, state: FSMContext):
             callback_data=f"event_{event.id}",
         )
     builder.adjust(1)
-    
+
     await state.set_state(MarkStudentsState.selecting_event)
     await message.answer("Выберите мероприятие:", reply_markup=builder.as_markup())
 
-@mark_students_router.callback_query(F.data.startswith("event_"), StateFilter(MarkStudentsState.selecting_event))
+
+@mark_students_router.callback_query(
+    F.data.startswith("event_"), StateFilter(MarkStudentsState.selecting_event)
+)
 async def select_students(callback: CallbackQuery, state: FSMContext):
     event_id = int(callback.data.split("_")[1])
     EVENTS = CompetitionDAO.get_all_competition()  # список объектов Competition
@@ -44,18 +48,19 @@ async def select_students(callback: CallbackQuery, state: FSMContext):
         event_id=event_id,
         selected=set(),
         competition_name=competition.name,
-        current_page=0
+        current_page=0,
     )
     await state.set_state(MarkStudentsState.selecting_students)
-    
+
     # Отправляем первую страницу студентов
     await show_students_page(callback, state)
+
 
 async def show_students_page(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     selected = data.get("selected", set())
     current_page = data.get("current_page", 0)
-    
+
     # Разбиваем студентов на страницы по 5 человек
     students_per_page = 5
     start_idx = current_page * students_per_page
@@ -88,38 +93,48 @@ async def show_students_page(callback: CallbackQuery, state: FSMContext):
     builder.row(*nav_buttons)
 
     await callback.message.edit_text(
-        f"Выберите студентов для мероприятия {data['competition_name']} [Страница {current_page+1} из {total_pages}]",
+        f"Выберите студентов для мероприятия {data['competition_name']} [Страница {current_page + 1} из {total_pages}]",
         reply_markup=builder.as_markup(),
     )
 
-@mark_students_router.callback_query(F.data.startswith("toggle_"), StateFilter(MarkStudentsState.selecting_students))
+
+@mark_students_router.callback_query(
+    F.data.startswith("toggle_"), StateFilter(MarkStudentsState.selecting_students)
+)
 async def toggle_student(callback: CallbackQuery, state: FSMContext):
     student_id = int(callback.data.split("_")[1])
     data = await state.get_data()
     selected = set(data.get("selected", set()))
-    
+
     if student_id in selected:
         selected.remove(student_id)
     else:
         selected.add(student_id)
-    
+
     await state.update_data(selected=selected)
     await show_students_page(callback, state)
 
-@mark_students_router.callback_query(F.data.in_(["page_prev", "page_next"]), StateFilter(MarkStudentsState.selecting_students))
+
+@mark_students_router.callback_query(
+    F.data.in_(["page_prev", "page_next"]),
+    StateFilter(MarkStudentsState.selecting_students),
+)
 async def change_page(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     current_page = data.get("current_page", 0)
-    
+
     if callback.data == "page_prev":
         current_page -= 1
     else:
         current_page += 1
-    
+
     await state.update_data(current_page=current_page)
     await show_students_page(callback, state)
 
-@mark_students_router.callback_query(F.data == "confirm", StateFilter(MarkStudentsState.selecting_students))
+
+@mark_students_router.callback_query(
+    F.data == "confirm", StateFilter(MarkStudentsState.selecting_students)
+)
 async def confirm_selection(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     selected_ids = data.get("selected", set())
@@ -144,7 +159,10 @@ async def confirm_selection(callback: CallbackQuery, state: FSMContext):
         reply_markup=builder.as_markup(),
     )
 
-@mark_students_router.callback_query(F.data == "final_confirm", StateFilter(MarkStudentsState.confirmation))
+
+@mark_students_router.callback_query(
+    F.data == "final_confirm", StateFilter(MarkStudentsState.confirmation)
+)
 async def final_confirmation(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
@@ -162,7 +180,10 @@ async def final_confirmation(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         await callback.answer(f"Ошибка: {str(e)}")
 
-@mark_students_router.callback_query(F.data == "cancel", StateFilter(MarkStudentsState.confirmation))
+
+@mark_students_router.callback_query(
+    F.data == "cancel", StateFilter(MarkStudentsState.confirmation)
+)
 async def cancel_action(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.edit_text("Действие отменено.")
