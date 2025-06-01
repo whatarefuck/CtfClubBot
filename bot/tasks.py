@@ -82,6 +82,7 @@ async def handle_expired_task(notify, user, task):
     logger.info(student_message)
     await notify._say_student(user, student_message)
 
+
 async def restore_student_lives():
     """Восстановление жизней всех активных студентов до 3-х."""
     try:
