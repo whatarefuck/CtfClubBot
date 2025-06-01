@@ -8,9 +8,7 @@ ENV_PATH = Path(__file__).parent.parent / ".env"
 
 class Config(BaseSettings):
     BOT_TOKEN: str = (
-
         "7664854738:AAGMUTXm2uT7eUR4O8tl7lLs145f7Fv5KoM"  # your tg bot token from botfather
-
     )
     DATABASE_URL: str = "postgresql://ctf:ctf@localhost:5432/ctf"
     ADMIN_NICKNAMES: str = "tgadminnick1,tgadminnick2"
@@ -24,7 +22,7 @@ class Config(BaseSettings):
 
     s_min = 50
     HEAL_LIMIT: int = 3
-    
+
     @property
     def teacher_ids(self):
         return self._teacher_ids.split(",")
@@ -32,6 +30,7 @@ class Config(BaseSettings):
     class Config:
         env_file = ENV_PATH
         extra = "allow"  # Разрешить дополнительные параметры
+
 
 # Instantiate the config
 config = Config()
