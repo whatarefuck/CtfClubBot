@@ -15,7 +15,7 @@ class User(Base):
     full_name = Column(String)
     root_me_nickname = Column(String)
     lives = Column(Integer, default=3)
-    points = Column(Integer, default=30)
+    points = Column(Integer, nullable=False, default=0)
     violations = Column(Integer, default=0)
     tasks = relationship("Task", back_populates="assigned_user")
     participations = relationship("Participation", back_populates="user")
@@ -35,6 +35,7 @@ class Task(Base):
     assigned_user_id = Column(Integer, ForeignKey("users.id"))
     completed = Column(Boolean, default=False)
     url = Column(String)
+    violation_recorded = Column(Boolean, nullable=True)
 
     assigned_user = relationship("User", back_populates="tasks")
 
