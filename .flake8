@@ -94,6 +94,8 @@ ignore =
   E712 
   ; Line too long (133 > 120 characters)
   E501 
+  ;the function is too complex
+  C901
 
 per-file-ignores =
   ; all tests

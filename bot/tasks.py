@@ -5,6 +5,7 @@ from logging import getLogger
 from utils.notifications import Notifications
 from database.db import get_db
 from database.user_dao import UserDAO
+from database.task_dao import TaskDao
 
 from utils.root_me import get_solved_tasks_of_student
 
@@ -15,38 +16,71 @@ logger = getLogger()
 async def sync_education_tasks(bot: Bot):
     while True:
         with get_db() as session:
-            # Fetch all users with their tasks
-            dao = UserDAO(session)
-            users = dao.get_all_students_with_tasks()
-            for user in users:
-                if user.root_me_nickname:
-                    # try:
-                    solved_tasks = await get_solved_tasks_of_student(
-                        user.root_me_nickname
-                    )
-                    for task in user.tasks:
-                        task.completed = task.name in solved_tasks
-                        if not task.completed and task.is_expired and not task.violation_recorded:
-                            user.lives -= 1
-                            user.violations += 1
-                            task.violation_recorded = True  # Отмечаем, что нарушение обработано
-                            teacher_message = (
-                                f"Задача {task.name} истека у студента {user}."
-                            )
-                            logger.info(teacher_message)
-                            notify = Notifications(bot)
-                            await notify.say_about_deadline_fail(teacher_message)
-                            student_message = f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, чтобы избежать потерь.\
-                                      Если у тебя есть вопросы или трудности, не стесняйся обращаться за помощью в общий чат."
-                            logger.info(student_message)
-                            await notify._say_student(user, student_message)
-
-                    session.commit()
-                    logger.info(f"Synced tasks for user: {user.username}")
-                    # except Exception as e:
-                    #     logger.error(f"Error syncing tasks for {user.username}: {e.}")
-                await asyncio.sleep(60)
+            await process_all_users_tasks(bot, session)
         await asyncio.sleep(0.1)
+
+
+async def process_all_users_tasks(bot: Bot, session):
+    dao = UserDAO(session)
+    users = dao.get_all_students_with_tasks()
+    for user in users:
+        if user.root_me_nickname:
+            await process_user_tasks(bot, session, user)
+            logger.info(f"Synced tasks for user: {user.username}")
+        await asyncio.sleep(60)
+
+
+async def process_user_tasks(bot: Bot, session, user):
+    task_dao = TaskDao(session)
+    notify = Notifications(bot)
+
+    try:
+        solved_tasks = await get_solved_tasks_of_student(user.root_me_nickname)
+        for task in user.tasks:
+            await process_single_task(task_dao, notify, user, task, solved_tasks)
+        session.commit()
+    except Exception as e:
+        logger.error(f"Error syncing tasks for {user.username}: {e}")
+
+
+async def process_single_task(task_dao, notify, user, task, solved_tasks):
+    task.completed = task.name in solved_tasks
+
+    if task.completed:
+        await handle_completed_task(task_dao, notify, user, task)
+    elif not task.completed and task.is_expired and not task.violation_recorded:
+        await handle_expired_task(notify, user, task)
+
+
+async def handle_completed_task(task_dao, notify, user, task):
+    score = task_dao.score_for_tasks(task.name, user.id)
+    user.points += score
+
+    student_message = f"Молодец, ты решил задачу {task.name} и получил {score} очков"
+    admin_log = f"{user.username} - {user.full_name} решил задачу {task.name} и получил {score} очков"
+
+    logger.info(admin_log)
+    await notify._say_teachers(admin_log)
+    await notify._say_student(user, student_message)
+
+
+async def handle_expired_task(notify, user, task):
+    user.lives -= 1
+    user.violations += 1
+    task.violation_recorded = True
+
+    teacher_message = f"Задача {task.name} истека у студента {user}."
+    logger.info(teacher_message)
+
+    await notify.say_about_deadline_fail(teacher_message)
+
+    student_message = (
+        f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, "
+        "чтобы избежать потерь. Если у тебя есть вопросы или трудности, "
+        "не стесняйся обращаться за помощью в общий чат."
+    )
+    logger.info(student_message)
+    await notify._say_student(user, student_message)
 
 
 async def restore_student_lives():
