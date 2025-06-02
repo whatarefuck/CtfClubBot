@@ -11,8 +11,6 @@ from database.user_dao import UserDAO
 from database.competition_dao import CompetitionDao
 from utils.root_me import get_solved_tasks_of_student
 
-import os
-
 
 logger = getLogger()
 
@@ -90,6 +88,14 @@ async def restore_student_lives():
         logger.error(f"Ошибка при восстановлении жизней: {e}")
 
 
+async def notify_event_participants(bot: Bot, event, prefix: str):
+    notify = Notifications(bot)
+    for participation in event.participations:
+        user = participation.user
+        msg = f"{prefix}: {event.name} в {event.date.strftime('%H:%M')}."
+        await notify._say_student(user, msg)
+
+
 async def send_event_notifications(bot: Bot):
     """Отправка уведомлений о событиях за 1 день и в день мероприятия."""
     try:
@@ -109,31 +115,15 @@ async def send_event_notifications(bot: Bot):
 
             for event in today_events:
                 logger.info(f"Уведомление о событии сегодня: {event.name}")
-                notify = Notifications(bot)
-                for participation in event.participations:
-                    user = participation.user
-                    msg = (
-                        f"Сегодня: {event.name} в "
-                        f"{event.date.strftime('%H:%M')}."
-                    )
-                    await notify._say_student(user, msg)
+                await notify_event_participants(bot, event, "Сегодня")
 
             for event in tomorrow_events:
                 logger.info(f"Уведомление о событии завтра: {event.name}")
-                notify = Notifications(bot)
-                for participation in event.participations:
-                    user = participation.user
-                    msg = (
-                        f"Завтра: {event.name} в "
-                        f"{event.date.strftime('%H:%M')}."
-                    )
-                    await notify._say_student(user, msg)
+                await notify_event_participants(bot, event, "Завтра")
 
     except Exception as e:
         logger.error(f"Ошибка при отправке уведомлений: {e}")
 
 
-#if __name__ == "__main__":
-#    asyncio.run(sync_education_tasks())
 # Закомментировал __main__-блок, потому что этот файл подключается как модуль в основном боте,
 # и запуск его напрямую приведёт к ошибке из-за отсутствия аргумента bot.
