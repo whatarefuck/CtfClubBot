@@ -46,8 +46,10 @@ async def process_user_tasks(bot: Bot, session, user):
 async def process_single_task(task_dao, notify, user, task, solved_tasks):
     task.completed = task.name in solved_tasks
 
-                        if task.completed:
-                            from settings import Config
+    if task.completed:
+        await handle_completed_task(task_dao, notify, user, task)
+    elif not task.completed and task.is_expired and not task.violation_recorded:
+        await handle_expired_task(notify, user, task)
 
 
 async def handle_completed_task(task_dao, notify, user, task):

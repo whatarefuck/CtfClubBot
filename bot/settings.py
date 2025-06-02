@@ -20,7 +20,7 @@ class Config(BaseSettings):
     minimum_xp_count_to_heal: int = 10
     _teacher_ids: list[int] = "393200400,704339275"
 
-    s_min = 50
+    s_min: int = 50
     HEAL_LIMIT: int = 3
 
     @property
