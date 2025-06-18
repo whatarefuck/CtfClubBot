@@ -5,7 +5,7 @@ from typing import Callable, Dict, Any, Awaitable, Optional
 from database.db import get_db
 from database.user_dao import UserDAO
 from logging import getLogger
-# from settings import Config
+from settings import Config
 
 logger = getLogger()
 
@@ -56,13 +56,13 @@ class AuthMiddleware(BaseMiddleware):
             data["user"] = user
 
         # Список админских команд
-        # admin_commands = ["/add_competition", "/mark_students", "/add_task"]
+        admin_commands = ["/add_competition", "/mark_students", "/add_task"]
 
         # Если команда админская, проверяем права
-        # if event.text and any(event.text.startswith(cmd) for cmd in admin_commands):
-        # teacher_ids = [int(id) for id in Config()._teacher_ids.split(",")]
-        # if event.from_user.id not in teacher_ids:
-        #     await event.answer("⛔ У вас нет прав для выполнения этой команды")
-        #     return
+        if event.text and any(event.text.startswith(cmd) for cmd in admin_commands):
+            teacher_ids = [int(id) for id in Config()._teacher_ids.split(",")]
+        if event.from_user.id not in teacher_ids:
+            await event.answer("⛔ У вас нет прав для выполнения этой команды")
+            return
 
         return await handler(event, data)
