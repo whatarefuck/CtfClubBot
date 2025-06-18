@@ -30,7 +30,6 @@ class CompetitionDao:
         self.session.refresh(new_competition)
         return new_competition
 
-
     def get_all_competition(self):
         return self.session.query(Competition).all()
 
@@ -38,10 +37,6 @@ class CompetitionDao:
         """Получить события в заданном временном диапазоне."""
         return (
             self.session.query(Competition)
-            .filter(
-                Competition.date >= start_time,
-                Competition.date < end_time
-            )
+            .filter(Competition.date >= start_time, Competition.date < end_time)
             .all()
         )
-
