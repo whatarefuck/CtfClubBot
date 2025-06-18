@@ -4,7 +4,7 @@ from database.models import Competition
 
 
 class CompetitionDao:
-    """Data access object for Task"""
+    """Data access object for Competition"""
 
     def __init__(self, session):
         self.session = session
@@ -30,5 +30,18 @@ class CompetitionDao:
         self.session.refresh(new_competition)
         return new_competition
 
+
     def get_all_competition(self):
         return self.session.query(Competition).all()
+
+    def get_events_between(self, start_time: datetime, end_time: datetime):
+        """Получить события в заданном временном диапазоне."""
+        return (
+            self.session.query(Competition)
+            .filter(
+                Competition.date >= start_time,
+                Competition.date < end_time
+            )
+            .all()
+        )
+

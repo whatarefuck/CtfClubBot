@@ -23,6 +23,7 @@ from handlers import (
 from settings import config
 from middlewares import AuthMiddleware
 from tasks import sync_education_tasks
+from tasks import send_event_notifications
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
@@ -69,7 +70,6 @@ dp.message.middleware(AuthMiddleware())
 
 
 async def main():
-
     scheduler = AsyncIOScheduler()
     # Добавляем периодическую задачу восстановления жизней
     # Выполняется каждое 10-е число месяца в 00:00 по МСК (UTC+3)
@@ -85,13 +85,23 @@ async def main():
         name="Восстановление жизней студентов",
         replace_existing=True,
     )
-
+    scheduler.add_job(
+        send_event_notifications,
+        args=[bot],
+        trigger=CronTrigger(
+            hour=6,
+            minute=0,
+            timezone=timezone("Europe/Moscow"),
+        ),
+        id="send_event_notifications",
+        name="Отправка уведомлений о событиях",
+        replace_existing=True,
+    )
     # Запускаем планировщик
     scheduler.start()
     await bot.set_my_commands(commands)
     # Запускаем задачу синхронизации задач
     asyncio.create_task(sync_education_tasks(bot))  # Фоновая задача
-
     await dp.start_polling(bot)
 
 
