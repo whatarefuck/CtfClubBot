@@ -1,11 +1,14 @@
 import asyncio
+from datetime import datetime, timedelta
 from aiogram import Bot
 from logging import getLogger
+from pytz import timezone
 
 from utils.notifications import Notifications
 from database.db import get_db
 from database.user_dao import UserDAO
 
+from database.competition_dao import CompetitionDao
 from utils.root_me import get_solved_tasks_of_student
 
 
@@ -27,8 +30,7 @@ async def sync_education_tasks(bot: Bot):
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
                         if (
-                            not task.completed
-                            and task.is_expired
+                            not task.completed and task.is_expire
                             and not task.violation_recorded
                         ):
                             user.lives -= 1
@@ -39,9 +41,16 @@ async def sync_education_tasks(bot: Bot):
                             )
                             logger.info(teacher_message)
                             notify = Notifications(bot)
-                            await notify.say_about_deadline_fail(teacher_message)
-                            student_message = f"Ты потерял 1 HP за задачу {task.name}. 😢 Пожалуйста, старайся выполнять задания вовремя, чтобы избежать потерь.\
-                                      Если у тебя есть вопросы или трудности, не стесняйся обращаться за помощью в общий чат."
+                            await notify.say_about_deadline_fail(
+                                teacher_message
+                            )
+                            student_message = (
+                                f"Ты потерял 1 HP за задачу {task.name}. 😢 "
+                                "Пожалуйста, старайся выполнять задания вовремя, "
+                                "чтобы избежать потерь. Если у тебя есть вопросы "
+                                "или трудности, не стесняйся обращаться за помощью "
+                                "в общий чат."
+                            )
                             logger.info(student_message)
                             await notify._say_student(user, student_message)
 
@@ -79,5 +88,42 @@ async def restore_student_lives():
         logger.error(f"Ошибка при восстановлении жизней: {e}")
 
 
-if __name__ == "__main__":
-    asyncio.run(sync_education_tasks())
+async def notify_event_participants(bot: Bot, event, prefix: str):
+    notify = Notifications(bot)
+    for participation in event.participations:
+        user = participation.user
+        msg = f"{prefix}: {event.name} в {event.date.strftime('%H:%M')}."
+        await notify._say_student(user, msg)
+
+
+async def send_event_notifications(bot: Bot):
+    """Отправка уведомлений о событиях за 1 день и в день мероприятия."""
+    try:
+        moscow_tz = timezone('Europe/Moscow')
+        now = datetime.now(moscow_tz)
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+        tomorrow_start = today_start + timedelta(days=1)
+        tomorrow_end = today_start + timedelta(days=2)
+
+        with get_db() as session:
+            dao = CompetitionDao(session)
+            today_events = dao.get_events_between(today_start, today_end)
+            tomorrow_events = dao.get_events_between(
+                tomorrow_start, tomorrow_end
+            )
+
+            for event in today_events:
+                logger.info(f"Уведомление о событии сегодня: {event.name}")
+                await notify_event_participants(bot, event, "Сегодня")
+
+            for event in tomorrow_events:
+                logger.info(f"Уведомление о событии завтра: {event.name}")
+                await notify_event_participants(bot, event, "Завтра")
+
+    except Exception as e:
+        logger.error(f"Ошибка при отправке уведомлений: {e}")
+
+
+# Закомментировал __main__-блок, потому что этот файл подключается как модуль в основном боте,
+# и запуск его напрямую приведёт к ошибке из-за отсутствия аргумента bot.
