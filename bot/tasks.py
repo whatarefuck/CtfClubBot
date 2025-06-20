@@ -30,20 +30,19 @@ async def sync_education_tasks(bot: Bot):
                     for task in user.tasks:
                         task.completed = task.name in solved_tasks
                         if (
-                            not task.completed and task.is_expired
+                            not task.completed
+                            and task.is_expire
                             and not task.violation_recorded
                         ):
                             user.lives -= 1
                             user.violations += 1
-                            task.violation_recorded = True  # Отмечаем, что нарушение обработано
+                            task.violation_recorded = True
                             teacher_message = (
                                 f"Задача {task.name} истека у студента {user}."
                             )
                             logger.info(teacher_message)
                             notify = Notifications(bot)
-                            await notify.say_about_deadline_fail(
-                                teacher_message
-                            )
+                            await notify.say_about_deadline_fail(teacher_message)
                             student_message = (
                                 f"Ты потерял 1 HP за задачу {task.name}. 😢 "
                                 "Пожалуйста, старайся выполнять задания вовремя, "
@@ -99,7 +98,7 @@ async def notify_event_participants(bot: Bot, event, prefix: str):
 async def send_event_notifications(bot: Bot):
     """Отправка уведомлений о событиях за 1 день и в день мероприятия."""
     try:
-        moscow_tz = timezone('Europe/Moscow')
+        moscow_tz = timezone("Europe/Moscow")
         now = datetime.now(moscow_tz)
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
@@ -109,9 +108,7 @@ async def send_event_notifications(bot: Bot):
         with get_db() as session:
             dao = CompetitionDao(session)
             today_events = dao.get_events_between(today_start, today_end)
-            tomorrow_events = dao.get_events_between(
-                tomorrow_start, tomorrow_end
-            )
+            tomorrow_events = dao.get_events_between(tomorrow_start, tomorrow_end)
 
             for event in today_events:
                 logger.info(f"Уведомление о событии сегодня: {event.name}")

@@ -18,6 +18,7 @@ from handlers import (
     heal_router,
     leaderboard_router,
     my_profile_router,
+    mark_students_router,
 )
 from settings import config
 from middlewares import AuthMiddleware
@@ -42,10 +43,12 @@ commands = [
         command="/missed_deadlines", description="Посмотреть пропущенные дедлайны"
     ),
     types.BotCommand(command="/add_competition", description="Создать мероприятие"),
+    types.BotCommand(command="/mark_students", description="Отметить присутствующих"),
 ]
 
 dp.include_routers(
     start_router,
+    mark_students_router,
     add_task_router,
     add_competition_router,
     my_tasks_router,
