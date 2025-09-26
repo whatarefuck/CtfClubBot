@@ -61,8 +61,8 @@ class AuthMiddleware(BaseMiddleware):
         # Если команда админская, проверяем права
         if event.text and any(event.text.startswith(cmd) for cmd in admin_commands):
             teacher_ids = [int(id) for id in Config()._teacher_ids.split(",")]
-        if event.from_user.id not in teacher_ids:
-            await event.answer("⛔ У вас нет прав для выполнения этой команды")
-            return
+            if event.from_user.id not in teacher_ids:
+                await event.answer("⛔ У вас нет прав для выполнения этой команды")
+                return
 
         return await handler(event, data)
