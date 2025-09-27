@@ -27,7 +27,6 @@ from tasks import send_event_notifications
 
 
 import sys
-import logging
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
