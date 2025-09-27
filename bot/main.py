@@ -25,8 +25,97 @@ from middlewares import AuthMiddleware
 from tasks import sync_education_tasks
 from tasks import send_event_notifications
 
-# Включаем логирование, чтобы не пропустить важные сообщения
-logging.basicConfig(level=logging.INFO)
+
+import sys
+import logging
+from pathlib import Path
+from logging.handlers import RotatingFileHandler
+
+# ---------- Logging setup ----------
+# Требуется, чтобы `config` был уже импортирован ранее (from settings import config)
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+
+# Всегда логируем в stdout
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setFormatter(formatter)
+stream_handler.setLevel(logging.INFO)
+
+handlers = [stream_handler]
+
+# Если prod — лог в /var/log/ctfbotrun.log (с ротацией). При проблемах — fallback в /tmp
+if getattr(config, "ENV", "").lower() == "prod":
+    primary_log = Path("/var/log/ctfbotrun.log")
+    fallback_log = Path("/tmp/ctfbotrun.log")
+    fallback_used = None
+    file_handler = None
+
+    # Попытка создать /var/log/ctfbotrun.log
+    try:
+        # Создаём папку, если вдруг отсутствует (обычно не требуется)
+        primary_log.parent.mkdir(parents=True, exist_ok=True)
+        # Попытка создать файл (если ещё нет) — может выбросить PermissionError
+        primary_log.touch(mode=0o644, exist_ok=True)
+
+        # Ротация: 10 MB на файл, 5 бэкапов
+        file_handler = RotatingFileHandler(
+            filename=str(primary_log),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=5,
+            encoding="utf-8",
+        )
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.INFO)
+        handlers.append(file_handler)
+
+    except Exception as err_primary:
+        # Если не удалось записать в /var/log — попробуем fallback (/tmp)
+        print(f"Warning: cannot create/write {primary_log!s}: {err_primary}. Trying fallback {fallback_log!s}.", file=sys.stderr)
+        try:
+            fallback_log.parent.mkdir(parents=True, exist_ok=True)
+            fallback_log.touch(mode=0o644, exist_ok=True)
+            file_handler = RotatingFileHandler(
+                filename=str(fallback_log),
+                maxBytes=5 * 1024 * 1024,
+                backupCount=3,
+                encoding="utf-8",
+            )
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(logging.INFO)
+            handlers.append(file_handler)
+            fallback_used = fallback_log
+        except Exception as err_fallback:
+            # Не получилось ни туда — печатаем в stderr и продолжаем только с stdout
+            print(f"Error: cannot create/write fallback log {fallback_log!s}: {err_fallback}. Continuing with stdout only.", file=sys.stderr)
+            file_handler = None
+
+# Сбрасываем существующие хэндлеры (чтобы не дублировать при повторных импортax) и добавляем новые
+if root_logger.handlers:
+    root_logger.handlers.clear()
+
+for h in handlers:
+    root_logger.addHandler(h)
+
+# После установки хэндлеров — пишем запусковые сообщения
+root_logger.info("Logger initialized. stdout logging enabled.")
+if getattr(config, "ENV", "").lower() == "prod":
+    # Определим, куда именно пишем (ищем последний файловый хэндлер)
+    file_handlers = [h for h in handlers if isinstance(h, (RotatingFileHandler, logging.FileHandler))]
+    if file_handlers:
+        # Берём путь из первого файлового handler'а
+        log_path = getattr(file_handlers[0], "baseFilename", None)
+        root_logger.info("Also logging to file: %s", log_path)
+    else:
+        root_logger.warning("ENV=prod but no file logger could be created; logs will go to stdout only.")
+
+# Ограничим шум от некоторых библиотек (опционально)
+logging.getLogger("aiogram").setLevel(logging.INFO)
+logging.getLogger("apscheduler").setLevel(logging.INFO)
+# ---------- End logging setup ----------
+
 # Объект бота
 bot = Bot(token=config.BOT_TOKEN)
 # Диспетчер
