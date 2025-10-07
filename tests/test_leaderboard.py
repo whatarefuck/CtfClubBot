@@ -6,7 +6,6 @@ from bot.handlers.leaderboard import (
     format_user_status,
     leaderboard_handler,
 )
-from bot.database.user_dao import UserDAO
 from unittest.mock import patch
 
 
