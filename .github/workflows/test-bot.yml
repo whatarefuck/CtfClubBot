@@ -62,7 +62,7 @@ jobs:
       run: |
         alembic upgrade head
 
-    - name: Run bot test
+    - name: Run bot
       env:
         DATABASE_URL: postgresql://ctf:ctf@localhost:5432/ctf
       run: |
@@ -71,6 +71,12 @@ jobs:
         sleep 10
         ps -p $BOT_PID && echo "Бот успешно запущен"
       shell: bash
+    - name: Run Tests
+      env:
+        DATABASE_URL: postgresql://ctf:ctf@localhost:5432/ctf
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      run: |
+        pytest tests/ -v --cov=bot --cov-report=xml
 
     - name: Cleanup
       if: always()
