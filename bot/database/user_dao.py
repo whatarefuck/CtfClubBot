@@ -65,12 +65,14 @@ class UserDAO:
             user.tasks = [task for task in user.tasks if not task.completed]
         return users
 
-    def heal(self, user: User) -> None:
+    def heal(self, user: User) -> User:
         """Обменять 10 опыта на 3 жизни."""
-        user.lives += 3
-        user.points -= 10
+        persistent_user = self.session.merge(user)
+        persistent_user.lives += 3
+        persistent_user.points -= 10
         self.session.commit()
-        self.session.refresh(user)
+        self.session.refresh(persistent_user)
+        return persistent_user
 
     def get_teachers(self) -> List[User]:
         """Получить всех учителей (старшекурсников) по tg_id."""
